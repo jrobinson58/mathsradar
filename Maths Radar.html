@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maths Radar — AI-Powered Maths Diagnostics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg:#080f1a;
+  --bg2:#0d1726;
+  --bg3:#111f33;
+  --card:#13213a;
+  --card2:#162645;
+  --navy:#0d2b55;
+  --border:#1e3355;
+  --border2:#243f6a;
+  --green:#00e5a0;
+  --green2:#00c488;
+  --green-dim:rgba(0,229,160,0.12);
+  --green-glow:rgba(0,229,160,0.25);
+  --blue:#3b82f6;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --white:#ffffff;
+  --text:#e8f0fe;
+  --text2:#8ba3c7;
+  --text3:#4d6a94;
+  --shadow:0 4px 32px rgba(0,0,0,0.4);
+  --shadow-green:0 0 24px rgba(0,229,160,0.15);
+  --r:14px;
+  --r2:20px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* ── HERO / LANDING ── */
+#landing{flex-direction:column;background:var(--bg);overflow-y:auto;}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid var(--border);background:rgba(8,15,26,0.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo-icon{width:32px;height:32px;position:relative;}
+.nav-logo-icon svg{width:100%;height:100%;}
+.nav-logo-text{font-size:18px;font-weight:800;color:var(--white);letter-spacing:-0.5px;}
+.nav-logo-text span{color:var(--green);}
+.nav-badge{background:var(--green-dim);border:1px solid rgba(0,229,160,0.3);color:var(--green);font-size:10px;font-weight:700;padding:3px 8px;border-radius:50px;letter-spacing:0.5px;text-transform:uppercase;}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-ghost:hover{border-color:var(--green);color:var(--green);}
+.btn-primary{background:var(--green);color:#061020;font-size:13px;font-weight:700;padding:9px 20px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-primary:hover{background:var(--green2);box-shadow:var(--shadow-green);}
+
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,160,0.06) 0%,transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid rgba(0,229,160,0.25);color:var(--green);font-size:12px;font-weight:600;padding:6px 14px;border-radius:50px;margin-bottom:28px;letter-spacing:0.3px;}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);}}
+.hero h1{font-size:clamp(32px,5vw,60px);font-weight:900;color:var(--white);line-height:1.1;letter-spacing:-1.5px;margin-bottom:18px;max-width:700px;}
+.hero h1 span{color:var(--green);}
+.hero p{font-size:clamp(15px,2vw,18px);color:var(--text2);line-height:1.6;max-width:520px;margin-bottom:36px;}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;}
+.btn-hero{background:var(--green);color:#061020;font-size:15px;font-weight:800;padding:14px 28px;border-radius:10px;border:none;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:8px;}
+.btn-hero:hover{background:var(--green2);box-shadow:0 0 32px rgba(0,229,160,0.3);transform:translateY(-1px);}
+.btn-hero-sec{background:transparent;border:1px solid var(--border2);color:var(--text);font-size:15px;font-weight:600;padding:14px 28px;border-radius:10px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-hero-sec:hover{border-color:var(--green);color:var(--green);}
+.hero-note{font-size:12px;color:var(--text3);margin-top:6px;}
+
+/* DASHBOARD PREVIEW */
+.dashboard-preview{width:100%;max-width:900px;margin:0 auto 80px;padding:0 24px;position:relative;}
+.dashboard-preview::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(0,229,160,0.05) 0%,transparent 70%);pointer-events:none;}
+.preview-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;box-shadow:var(--shadow);}
+.preview-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.preview-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;}
+.preview-badge{background:var(--green-dim);border:1px solid rgba(0,229,160,0.2);color:var(--green);font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;}
+.preview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.preview-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;}
+.preview-stat .ps-val{font-size:22px;font-weight:800;color:var(--white);}
+.preview-stat .ps-val.green{color:var(--green);}
+.preview-stat .ps-val.amber{color:var(--amber);}
+.preview-stat .ps-val.red{color:var(--red);}
+.preview-stat .ps-lbl{font-size:10px;color:var(--text3);font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px;}
+.preview-bars{display:flex;flex-direction:column;gap:8px;}
+.pb-row{display:flex;align-items:center;gap:10px;}
+.pb-label{font-size:11px;font-weight:600;color:var(--text2);width:140px;flex-shrink:0;}
+.pb-track{flex:1;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.pb-fill.secure{background:linear-gradient(90deg,var(--green),var(--green2));}
+.pb-fill.developing{background:linear-gradient(90deg,var(--amber),#fbbf24);}
+.pb-fill.support{background:linear-gradient(90deg,var(--red),#f87171);}
+.pb-pct{font-size:11px;font-weight:700;width:30px;text-align:right;}
+.pb-pct.secure{color:var(--green);}
+.pb-pct.developing{color:var(--amber);}
+.pb-pct.support{color:var(--red);}
+.pb-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:50px;text-transform:uppercase;letter-spacing:0.3px;flex-shrink:0;}
+.pb-tag.secure{background:rgba(0,229,160,0.12);color:var(--green);}
+.pb-tag.developing{background:rgba(245,158,11,0.12);color:var(--amber);}
+.pb-tag.support{background:rgba(239,68,68,0.12);color:var(--red);}
+
+/* FEATURES */
+.features{padding:60px 24px;max-width:1000px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;text-align:center;}
+.section-title{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--white);text-align:center;letter-spacing:-0.5px;margin-bottom:8px;}
+.section-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:40px;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;transition:border-color 0.2s;}
+.feat-card:hover{border-color:var(--border2);}
+.feat-icon{width:40px;height:40px;border-radius:10px;background:var(--green-dim);border:1px solid rgba(0,229,160,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;}
+.feat-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.feat-desc{font-size:13px;color:var(--text2);line-height:1.6;}
+
+/* SCAN START */
+#scanStart{flex-direction:column;background:var(--bg);overflow-y:auto;}
+.scan-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;flex:1;}
+.scan-title{font-size:clamp(24px,4vw,40px);font-weight:900;color:var(--white);letter-spacing:-1px;margin-bottom:10px;}
+.scan-sub{font-size:14px;color:var(--text2);margin-bottom:32px;}
+.scan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:32px;width:100%;max-width:480px;box-shadow:var(--shadow);}
+.field-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
+.field-input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 15px;font-size:15px;color:var(--white);outline:none;transition:border-color 0.2s;font-family:'Inter',sans-serif;margin-bottom:14px;}
+.field-input:focus{border-color:var(--green);}
+.field-input::placeholder{color:var(--text3);}
+.year-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.yr-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.yr-btn:hover{border-color:var(--green);}
+.yr-btn.active{border-color:var(--green);background:var(--green-dim);}
+.yr-btn .yr-icon{font-size:18px;}
+.yr-btn .yr-label{font-size:12px;font-weight:700;color:var(--white);}
+.yr-btn .yr-sub{font-size:10px;color:var(--text3);}
+.scan-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.sm-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:14px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.sm-btn:hover{border-color:var(--green);}
+.sm-btn.active{border-color:var(--green);background:var(--green-dim);}
+.sm-btn .sm-icon{font-size:20px;}
+.sm-btn .sm-label{font-size:12px;font-weight:700;color:var(--white);}
+.sm-btn .sm-desc{font-size:9px;color:var(--text3);text-align:center;}
+.btn-scan{width:100%;background:var(--green);color:#061020;font-size:15px;font-weight:800;padding:15px;border-radius:10px;border:none;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-scan:hover{background:var(--green2);box-shadow:var(--shadow-green);}
+.scan-links{display:flex;gap:16px;margin-top:12px;justify-content:center;}
+.scan-link{color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;font-weight:500;}
+.scan-link:hover{color:var(--green);}
+
+/* ASSESSMENT */
+#assessment{flex-direction:column;background:var(--bg);}
+.top-bar{background:rgba(8,15,26,0.95);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.top-bar-brand{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.top-bar-logo{font-size:14px;font-weight:800;color:var(--white);}
+.top-bar-logo span{color:var(--green);}
+.progress-wrap{flex:1;}
+.progress-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:600;}
+.progress-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:99px;transition:width 0.5s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(0,229,160,0.4);}
+.chips{display:flex;gap:6px;flex-shrink:0;}
+.chip{background:var(--card);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:4px 11px;font-size:11px;font-weight:700;white-space:nowrap;}
+.chip.green{background:var(--green-dim);border-color:rgba(0,229,160,0.3);color:var(--green);}
+.chip.streak{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.3);color:var(--amber);}
+.topic-chip{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:3px 10px;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+
+.q-container{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 40px;}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:32px;width:100%;max-width:700px;box-shadow:var(--shadow);animation:qIn 0.3s cubic-bezier(.4,0,.2,1);}
+@keyframes qIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.q-meta{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.q-num{font-size:11px;font-weight:600;color:var(--text3);}
+.q-timer{font-size:11px;font-weight:600;color:var(--text3);margin-left:auto;}
+.diff-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:50px;text-transform:uppercase;letter-spacing:0.5px;}
+.diff-easy{background:rgba(0,229,160,0.1);color:var(--green);border:1px solid rgba(0,229,160,0.2);}
+.diff-medium{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.2);}
+.diff-hard{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+.diff-challenge{background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.2);}
+.q-text{font-size:clamp(16px,2.5vw,20px);font-weight:700;color:var(--white);line-height:1.4;margin-bottom:18px;}
+
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.mc-opt{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:13px 16px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;transition:all 0.15s;display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;}
+.mc-opt:hover:not(:disabled){border-color:var(--green);background:var(--green-dim);color:var(--white);}
+.mc-opt .opt-letter{width:22px;height:22px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--text3);flex-shrink:0;}
+.mc-opt.correct{border-color:var(--green);background:var(--green-dim);}
+.mc-opt.correct .opt-letter{background:var(--green);color:#061020;}
+.mc-opt.wrong{border-color:var(--red);background:rgba(239,68,68,0.08);}
+.mc-opt.wrong .opt-letter{background:var(--red);color:white;}
+.mc-opt:disabled{cursor:default;}
+
+.input-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+.q-input{flex:1;min-width:90px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:18px;font-weight:700;color:var(--white);text-align:center;outline:none;transition:border-color 0.2s;font-family:'Inter',sans-serif;}
+.q-input:focus{border-color:var(--green);}
+.q-input.correct{border-color:var(--green);background:var(--green-dim);}
+.q-input.wrong{border-color:var(--red);background:rgba(239,68,68,0.08);}
+.btn-check{background:var(--green);color:#061020;border:none;border-radius:10px;padding:12px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:'Inter',sans-serif;}
+.btn-check:hover{background:var(--green2);}
+.btn-check:disabled{opacity:0.4;cursor:default;}
+
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.match-col{display:flex;flex-direction:column;gap:6px;}
+.match-col h4{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.match-item{background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;transition:all 0.15s;text-align:center;font-family:'Inter',sans-serif;}
+.match-item:hover:not(.matched):not(.wrong-match){border-color:var(--green);background:var(--green-dim);}
+.match-item.selected{border-color:var(--green);background:var(--green-dim);}
+.match-item.matched{border-color:var(--green);background:rgba(0,229,160,0.06);color:var(--green);cursor:default;}
+.match-item.wrong-match{border-color:var(--red);background:rgba(239,68,68,0.08);animation:shake 0.3s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+.feedback-box{margin-top:16px;padding:13px 16px;border-radius:12px;font-size:13px;font-weight:600;display:none;align-items:flex-start;gap:10px;}
+.feedback-box.show{display:flex;animation:fadeUp 0.25s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.feedback-box.success{background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);color:var(--green);}
+.feedback-box.retry{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:var(--amber);}
+.feedback-box.fail{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;}
+.feedback-icon{font-size:18px;flex-shrink:0;}
+.feedback-text{flex:1;}
+.feedback-text strong{display:block;font-size:14px;margin-bottom:2px;}
+.worked-example{margin-top:9px;background:rgba(255,255,255,0.04);border-radius:9px;padding:11px 13px;font-size:12px;font-weight:500;line-height:1.7;color:var(--text2);}
+.worked-example strong{font-size:12px;display:block;margin-bottom:3px;color:var(--text);}
+
+.btn-next{margin-top:18px;width:100%;background:var(--green);color:#061020;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;display:none;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.btn-next.show{display:block;animation:fadeUp 0.25s;}
+.btn-next:hover{background:var(--green2);}
+.working-area{margin-top:16px;}
+.working-area label{display:block;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.working-area textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:9px;font-size:12px;color:var(--text);resize:vertical;min-height:55px;outline:none;font-family:'Inter',sans-serif;}
+.diagram{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:16px;text-align:center;overflow-x:auto;}
+
+/* SCANNING ANIMATION */
+#scanning{flex-direction:column;align-items:center;justify-content:center;background:var(--bg);padding:40px 24px;}
+.scan-anim{width:200px;height:200px;position:relative;margin-bottom:32px;}
+.scan-circle{position:absolute;border-radius:50%;border:1px solid rgba(0,229,160,0.15);}
+.scan-c1{inset:0;}
+.scan-c2{inset:30px;}
+.scan-c3{inset:60px;}
+.scan-c4{inset:90px;}
+.scan-line{position:absolute;top:50%;left:50%;width:50%;height:2px;background:linear-gradient(90deg,transparent,var(--green));transform-origin:left center;animation:scanRotate 2s linear infinite;}
+@keyframes scanRotate{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.scan-dot{position:absolute;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+.scan-center{top:50%;left:50%;width:8px;height:8px;transform:translate(-50%,-50%);}
+.scan-title-text{font-size:22px;font-weight:800;color:var(--white);margin-bottom:8px;text-align:center;}
+.scan-subtitle{font-size:13px;color:var(--text2);text-align:center;margin-bottom:24px;}
+.scan-progress{width:280px;height:3px;background:var(--border);border-radius:99px;overflow:hidden;}
+.scan-progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:99px;width:0%;transition:width 0.3s;}
+.scan-steps{display:flex;flex-direction:column;gap:8px;width:280px;margin-top:20px;}
+.scan-step{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text3);font-weight:500;transition:color 0.3s;}
+.scan-step.active{color:var(--green);}
+.scan-step.done{color:var(--text2);}
+.scan-step-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background 0.3s;}
+.scan-step.active .scan-step-dot{background:var(--green);box-shadow:0 0 6px var(--green);}
+.scan-step.done .scan-step-dot{background:var(--text3);}
+
+/* RESULTS */
+#results{flex-direction:column;background:var(--bg);overflow-y:auto;}
+.results-nav{background:rgba(8,15,26,0.95);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);}
+.results-nav-logo{font-size:15px;font-weight:800;color:var(--white);}
+.results-nav-logo span{color:var(--green);}
+.btn-new-scan{background:var(--green-dim);border:1px solid rgba(0,229,160,0.3);color:var(--green);font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-new-scan:hover{background:rgba(0,229,160,0.2);}
+
+.results-body{max-width:900px;margin:0 auto;padding:32px 20px;width:100%;}
+.results-hero-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+.radar-score{position:relative;width:100px;height:100px;flex-shrink:0;}
+.radar-score svg{width:100%;height:100%;}
+.radar-score-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.radar-score-val{font-size:22px;font-weight:900;color:var(--white);}
+.radar-score-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;}
+.results-hero-info{flex:1;}
+.results-hero-name{font-size:20px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.results-hero-sub{font-size:13px;color:var(--text2);margin-bottom:14px;}
+.results-stats-row{display:flex;gap:10px;flex-wrap:wrap;}
+.rs-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;min-width:80px;}
+.rs-stat .rsv{font-size:18px;font-weight:800;color:var(--white);}
+.rs-stat .rsv.green{color:var(--green);}
+.rs-stat .rsv.amber{color:var(--amber);}
+.rs-stat .rsl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px;}
+
+.section-hd{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-hd::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.topic-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.topic-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;}
+.topic-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.topic-name{font-size:13px;font-weight:700;color:var(--white);}
+.topic-right{display:flex;align-items:center;gap:8px;}
+.topic-pct{font-size:13px;font-weight:800;}
+.topic-tag-pill{font-size:9px;font-weight:700;padding:2px 8px;border-radius:50px;text-transform:uppercase;letter-spacing:0.3px;}
+.tag-secure{background:rgba(0,229,160,0.1);color:var(--green);}
+.tag-developing{background:rgba(245,158,11,0.1);color:var(--amber);}
+.tag-support{background:rgba(239,68,68,0.1);color:var(--red);}
+.tag-mastery{background:rgba(139,92,246,0.1);color:#a78bfa;}
+.topic-bar-track{height:5px;background:var(--bg2);border-radius:99px;overflow:hidden;}
+.topic-bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.bar-secure{background:linear-gradient(90deg,var(--green),var(--green2));}
+.bar-developing{background:linear-gradient(90deg,var(--amber),#fbbf24);}
+.bar-support{background:linear-gradient(90deg,var(--red),#f87171);}
+.bar-mastery{background:linear-gradient(90deg,#a78bfa,#8b5cf6);}
+
+/* RADAR CHART */
+.radar-section{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:20px;}
+.radar-chart-wrap{display:flex;justify-content:center;margin:16px 0;}
+
+/* GAPS & STRENGTHS */
+.gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.gap-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:18px;}
+.gap-card-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.gap-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.gap-item:last-child{border-bottom:none;}
+.gap-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.gap-dot.green{background:var(--green);}
+.gap-dot.red{background:var(--red);}
+.gap-item-text{color:var(--text2);flex:1;}
+
+/* PARENT SUMMARY */
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:22px;margin-bottom:20px;}
+.summary-card p{font-size:13px;color:var(--text2);line-height:1.7;}
+.btn-copy{background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:11px;font-weight:700;padding:6px 13px;border-radius:7px;cursor:pointer;margin-top:10px;font-family:'Inter',sans-serif;}
+.btn-copy:hover{border-color:var(--green);color:var(--green);}
+
+/* REVIEW */
+.review-toggle-btn{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text2);font-size:13px;font-weight:600;padding:13px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;font-family:'Inter',sans-serif;}
+.review-toggle-btn:hover{border-color:var(--border2);color:var(--text);}
+.review-list{display:none;flex-direction:column;gap:8px;margin-bottom:20px;}
+.review-list.open{display:flex;}
+.review-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;border-left:3px solid var(--border);}
+.review-item.correct-item{border-left-color:var(--green);}
+.review-item.wrong-item{border-left-color:var(--red);}
+.review-q{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.review-ans{font-size:11px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;}
+.review-method{margin-top:7px;font-size:11px;color:var(--text2);background:var(--bg2);border-radius:7px;padding:7px 9px;line-height:1.6;}
+
+.recs-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:22px;margin-bottom:20px;}
+.rec-list{list-style:none;}
+.rec-list li{padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);display:flex;align-items:flex-start;gap:8px;}
+.rec-list li:last-child{border-bottom:none;}
+.rec-list li::before{content:'→';color:var(--green);font-weight:700;flex-shrink:0;}
+.rec-section-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+.footer-brand{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:32px;text-align:center;}
+.footer-brand h3{font-size:16px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.footer-brand h3 span{color:var(--green);}
+.footer-brand p{font-size:12px;color:var(--text3);margin-bottom:12px;}
+.btn-print{background:var(--green);color:#061020;border:none;border-radius:9px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* TIMES TABLES */
+#tables{flex-direction:column;align-items:center;justify-content:center;background:var(--bg);padding:24px;}
+#tablesGame{flex-direction:column;background:var(--bg);}
+#tablesResults{flex-direction:column;align-items:center;justify-content:center;background:var(--bg);padding:24px;overflow-y:auto;}
+.tb-btn{padding:10px 6px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);transition:all 0.15s;text-align:center;font-family:'Inter',sans-serif;}
+.tb-btn:hover{border-color:var(--green);color:var(--green);}
+.tb-btn.selected{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+.tmode-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;cursor:pointer;display:flex;flex-direction:row;align-items:center;gap:8px;transition:all 0.15s;width:100%;font-family:'Inter',sans-serif;}
+.tmode-btn:hover{border-color:var(--green);}
+.tmode-btn.active{border-color:var(--green);background:var(--green-dim);}
+
+/* HISTORY */
+#history{flex-direction:column;background:var(--bg);overflow-y:auto;}
+.history-header{background:var(--card);border-bottom:1px solid var(--border);padding:22px 20px;}
+.history-header h2{font-size:18px;font-weight:800;color:var(--white);margin-bottom:3px;}
+.history-header p{font-size:12px;color:var(--text3);}
+.btn-back{background:var(--bg2);border:1px solid var(--border2);color:var(--text2);border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:12px;font-family:'Inter',sans-serif;}
+.btn-back:hover{border-color:var(--green);color:var(--green);}
+.history-body{padding:20px;max-width:800px;margin:0 auto;width:100%;}
+.history-empty{text-align:center;color:var(--text3);padding:40px;font-size:13px;}
+.history-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-bottom:12px;}
+.history-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.history-name{font-size:13px;font-weight:800;color:var(--white);}
+.history-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.history-score{font-size:20px;font-weight:900;color:var(--green);}
+.history-bars{display:flex;flex-direction:column;gap:5px;}
+.history-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;}
+.history-bar-row span:first-child{width:130px;color:var(--text3);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.history-mini-bar{flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
+.history-mini-fill{height:100%;border-radius:99px;}
+.history-bar-row span:last-child{width:30px;text-align:right;font-weight:700;color:var(--text2);}
+
+/* CELEBRATION */
+.celebration{position:fixed;inset:0;background:rgba(4,8,16,0.85);display:none;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(8px);}
+.celebration.show{display:flex;animation:fadeUp 0.3s;}
+.celebration-card{background:var(--card);border:1px solid rgba(0,229,160,0.3);border-radius:24px;padding:40px 32px;text-align:center;max-width:320px;box-shadow:0 0 60px rgba(0,229,160,0.15);animation:popIn 0.4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+.celeb-icon{font-size:52px;display:block;margin-bottom:10px;}
+.celeb-msg{font-size:22px;font-weight:900;color:var(--white);margin-bottom:4px;letter-spacing:-0.5px;}
+.celeb-sub{color:var(--text2);font-size:13px;margin-bottom:16px;}
+.celeb-pts{font-size:17px;font-weight:800;color:var(--green);margin-bottom:4px;}
+.celeb-streak{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:16px;}
+.btn-celeb{background:var(--green);color:#061020;border:none;border-radius:10px;padding:11px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-celeb:hover{background:var(--green2);}
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;}
+.confetti-piece{position:absolute;width:8px;height:8px;top:-10px;opacity:0;animation:confettiFall linear forwards;}
+@keyframes confettiFall{0%{opacity:1;top:-10px}100%{opacity:0;top:100vh}}
+
+@media print{
+  body{background:white!important;color:black!important;}
+  #landing,#scanStart,#scanning,#assessment,#history,#tables,#tablesGame,#tablesResults,.celebration,.confetti-container{display:none!important;}
+  #results{display:block!important;min-height:unset;background:white!important;}
+  .results-nav,.btn-new-scan,.review-toggle-btn,.btn-print,.btn-copy{display:none!important;}
+  .review-list{display:flex!important;}
+  *{color:black!important;background:white!important;border-color:#ddd!important;}
+}
+@media(max-width:600px){
+  .mc-grid{grid-template-columns:1fr;}
+  .match-grid{grid-template-columns:1fr;}
+  .chips .topic-chip{display:none;}
+  .q-card{padding:18px;}
+  .gap-grid{grid-template-columns:1fr;}
+  .preview-grid{grid-template-columns:1fr 1fr;}
+  .nav{padding:14px 18px;}
+  .hero{padding:50px 18px 40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing" class="screen active">
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="15" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.3"/>
+          <circle cx="16" cy="16" r="10" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.4"/>
+          <circle cx="16" cy="16" r="5" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="27" y2="16" stroke="#00e5a0" stroke-width="1.5" stroke-opacity="0.8"/>
+          <circle cx="16" cy="16" r="2" fill="#00e5a0"/>
+          <circle cx="23" cy="10" r="1.5" fill="#00e5a0" opacity="0.7"/>
+          <circle cx="19" cy="20" r="1" fill="#00e5a0" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">Maths<span>Radar</span></span>
+      <span class="nav-badge">Beta</span>
+    </div>
+    <div class="nav-right">
+      <button class="btn-ghost" onclick="goTo('history')">Past Scans</button>
+      <button class="btn-primary" onclick="goTo('scanStart')">Start Free Scan</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-tag">AI-Powered UK Primary Maths Diagnostics</div>
+    <h1>Discover Your Child's<br><span>Maths Gaps</span> in Minutes</h1>
+    <p>AI-powered UK primary maths diagnostics for parents, tutors and schools. Curriculum-aligned. Instant results. Actionable insights.</p>
+    <div class="hero-ctas">
+      <button class="btn-hero" onclick="goTo('scanStart')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#061020" stroke-width="1.5" stroke-opacity="0.4"/><circle cx="8" cy="8" r="4" stroke="#061020" stroke-width="1.5" stroke-opacity="0.6"/><circle cx="8" cy="8" r="1.5" fill="#061020"/></svg>
+        Start Free Radar Scan
+      </button>
+      <button class="btn-hero-sec" onclick="goTo('tables')">✖️ Times Tables</button>
+    </div>
+    <p class="hero-note">No account required &bull; Year 3 &amp; 4 &bull; UK National Curriculum</p>
+  </section>
+
+  <div class="dashboard-preview">
+    <div class="preview-card">
+      <div class="preview-top">
+        <span class="preview-title">Sample Radar Report — Emma, Year 3</span>
+        <span class="preview-badge">Scan Complete</span>
+      </div>
+      <div class="preview-grid">
+        <div class="preview-stat"><div class="ps-val green">74%</div><div class="ps-lbl">Overall Score</div></div>
+        <div class="preview-stat"><div class="ps-val amber">68%</div><div class="ps-lbl">First-Time Right</div></div>
+        <div class="preview-stat"><div class="ps-val">🔥 5</div><div class="ps-lbl">Best Streak</div></div>
+      </div>
+      <div class="preview-bars">
+        <div class="pb-row"><span class="pb-label">Place Value</span><div class="pb-track"><div class="pb-fill secure" style="width:88%"></div></div><span class="pb-pct secure">88%</span><span class="pb-tag secure">Secure</span></div>
+        <div class="pb-row"><span class="pb-label">Multiplication</span><div class="pb-track"><div class="pb-fill secure" style="width:82%"></div></div><span class="pb-pct secure">82%</span><span class="pb-tag secure">Secure</span></div>
+        <div class="pb-row"><span class="pb-label">Fractions</span><div class="pb-track"><div class="pb-fill developing" style="width:61%"></div></div><span class="pb-pct developing">61%</span><span class="pb-tag developing">Developing</span></div>
+        <div class="pb-row"><span class="pb-label">Measurement</span><div class="pb-track"><div class="pb-fill developing" style="width:55%"></div></div><span class="pb-pct developing">55%</span><span class="pb-tag developing">Developing</span></div>
+        <div class="pb-row"><span class="pb-label">Statistics</span><div class="pb-track"><div class="pb-fill support" style="width:38%"></div></div><span class="pb-pct support">38%</span><span class="pb-tag support">Support Needed</span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="features">
+    <div class="section-label">Why Maths Radar</div>
+    <div class="section-title">Built for UK primary maths</div>
+    <div class="section-sub">Everything a tutor, parent or school needs to pinpoint exactly where a child is</div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🎯</div>
+        <div class="feat-title">Curriculum-Precise</div>
+        <div class="feat-desc">Every question mapped to the exact Year 3 and Year 4 UK National Curriculum statutory objectives. Nothing more, nothing less.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Instant Radar Report</div>
+        <div class="feat-desc">Results in minutes, not days. Topic-by-topic breakdown with Secure, Developing and Support Needed indicators.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Visual Diagnostics</div>
+        <div class="feat-desc">Radar charts, progress bars and performance indicators make gaps immediately visible to tutors and parents.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔄</div>
+        <div class="feat-title">Fresh Every Time</div>
+        <div class="feat-desc">Questions are randomised on every scan. Students can't memorise their way through — the data is always real.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📝</div>
+        <div class="feat-title">Parent Reports</div>
+        <div class="feat-desc">Auto-generated plain-English summaries ready to send to parents. Copy and paste in seconds.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📡</div>
+        <div class="feat-title">Progress Tracking</div>
+        <div class="feat-desc">Scan history stored locally. Run a second scan after a intervention block and see exactly what has improved.</div>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;padding:20px 24px 48px;border-top:1px solid var(--border);">
+    <p style="font-size:12px;color:var(--text3);">Brought to you by <strong style="color:var(--text2);">Joe Robinson</strong> &bull; Robinson Tuition &bull; Former Director of Maths</p>
+    <img src="data:image/jpeg;base64,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" style="width:52px;height:52px;object-fit:cover;object-position:top center;border-radius:50%;border:2px solid rgba(0,229,160,0.4);margin-top:12px;" alt="Joe Robinson" onerror="this.style.display='none'"/>
+  </div>
+</div>
+
+<!-- SCAN START -->
+<div id="scanStart" class="screen">
+  <div class="scan-hero">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;cursor:pointer;" onclick="goTo('landing')">
+      <span style="font-size:15px;font-weight:800;color:var(--white);">Maths<span style="color:var(--green);">Radar</span></span>
+    </div>
+    <div class="scan-title">Configure Your Scan</div>
+    <div class="scan-sub">Maths Radar will analyse performance across every curriculum topic</div>
+    <div class="scan-card">
+      <div class="field-label" style="margin-bottom:6px;">Student Name</div>
+      <input class="field-input" id="studentName" placeholder="e.g. Emma Smith"/>
+      <div class="field-label" style="margin-bottom:6px;">Year Group</div>
+      <div class="year-row" style="margin-bottom:14px;">
+        <button class="yr-btn active" id="btnY3" onclick="setYear(3)">
+          <span class="yr-icon">📗</span><span class="yr-label">Year 3</span><span class="yr-sub">Ages 7–8</span>
+        </button>
+        <button class="yr-btn" id="btnY4" onclick="setYear(4)">
+          <span class="yr-icon">📘</span><span class="yr-label">Year 4</span><span class="yr-sub">Ages 8–9</span>
+        </button>
+      </div>
+      <div class="field-label" style="margin-bottom:6px;">Scan Depth</div>
+      <div class="scan-modes">
+        <button class="sm-btn active" id="mode10" onclick="setMode(10)">
+          <span class="sm-icon">📡</span><span class="sm-label">Radar Scan</span><span class="sm-desc">10 questions</span>
+        </button>
+        <button class="sm-btn" id="mode20" onclick="setMode(20)">
+          <span class="sm-icon">🔭</span><span class="sm-label">Deep Scan</span><span class="sm-desc">20 questions</span>
+        </button>
+        <button class="sm-btn" id="modeFull" onclick="setMode('full')">
+          <span class="sm-icon">🛰️</span><span class="sm-label">Full Diagnostic</span><span class="sm-desc">All topics</span>
+        </button>
+      </div>
+      <button class="btn-scan" onclick="startAssessment()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#061020" stroke-width="1.5" stroke-opacity="0.5"/><circle cx="8" cy="8" r="4" stroke="#061020" stroke-width="1.5" stroke-opacity="0.7"/><circle cx="8" cy="8" r="1.5" fill="#061020"/></svg>
+        Launch Scan
+      </button>
+      <div class="scan-links">
+        <span class="scan-link" onclick="goTo('landing')">← Back</span>
+        <span class="scan-link" onclick="goTo('history')">📊 Past scans</span>
+        <span class="scan-link" onclick="goTo('tables')">✖️ Times tables</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCANNING ANIMATION -->
+<div id="scanning" class="screen">
+  <div class="scan-anim">
+    <div class="scan-circle scan-c1"></div>
+    <div class="scan-circle scan-c2"></div>
+    <div class="scan-circle scan-c3"></div>
+    <div class="scan-circle scan-c4"></div>
+    <div class="scan-line"></div>
+    <div class="scan-dot scan-center"></div>
+  </div>
+  <div class="scan-title-text">Scanning complete</div>
+  <div class="scan-subtitle" id="scanningSubtitle">Analysing performance data...</div>
+  <div class="scan-progress"><div class="scan-progress-fill" id="scanProgressFill"></div></div>
+  <div class="scan-steps" id="scanSteps"></div>
+</div>
+
+<!-- ASSESSMENT -->
+<div id="assessment" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-brand">
+      <span class="top-bar-logo">Maths<span>Radar</span></span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="progressText">Q1</span><span id="progressPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="chips">
+      <div class="chip green" id="scoreDisplay">⭐ 0</div>
+      <div class="chip" id="ftrDisplay">FTR: 0</div>
+      <div class="chip streak" id="streakDisplay" style="display:none">🔥 0</div>
+      <div class="topic-chip" id="topicTag">Number</div>
+    </div>
+  </div>
+  <div class="q-container"><div class="q-card" id="qCard"></div></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="results-nav">
+    <span class="results-nav-logo">Maths<span>Radar</span></span>
+    <button class="btn-new-scan" onclick="goTo('scanStart')">+ New Scan</button>
+  </div>
+  <div class="results-body">
+    <div class="results-hero-section" id="resultsHero"></div>
+    <div class="section-hd">Topic Breakdown</div>
+    <div class="topic-grid" id="topicBars"></div>
+    <div class="radar-section">
+      <div class="section-hd" style="margin-bottom:4px;">Performance Radar</div>
+      <div class="radar-chart-wrap"><canvas id="radarCanvas" width="320" height="320"></canvas></div>
+    </div>
+    <div class="gap-grid" id="gapGrid"></div>
+    <div class="section-hd">Parent Summary</div>
+    <div class="summary-card" id="parentSummary"></div>
+    <button class="review-toggle-btn" onclick="toggleReview()">📋 Review All Questions ▼</button>
+    <div class="review-list" id="reviewList"></div>
+    <div class="section-hd">Recommendations</div>
+    <div class="recs-card" id="recommendations"></div>
+    <div class="footer-brand">
+      <h3>Maths<span>Radar</span></h3>
+      <p>Powered by Robinson Tuition &bull; Brought to you by Joe Robinson</p>
+      <button class="btn-print" onclick="window.print()">🖨️ Print Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIMES TABLES -->
+<div id="tables" class="screen" style="flex-direction:column;align-items:center;justify-content:center;background:var(--bg);padding:24px;">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:20px;font-weight:900;color:var(--white);letter-spacing:-0.5px;margin-bottom:6px;">Times Table Practice</div>
+    <div style="font-size:13px;color:var(--text2);">Select tables, pick a mode, start drilling</div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:28px;width:100%;max-width:400px;box-shadow:var(--shadow);">
+    <div class="field-label" style="margin-bottom:8px;">Select Tables</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px;" id="tableSelect"></div>
+    <div class="field-label" style="margin-bottom:7px;">Mode</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px;">
+      <button class="tmode-btn active" id="tmodeNormal" onclick="setTableMode('normal')">
+        <span>⚡</span><div><div style="font-size:12px;font-weight:700;color:var(--white);">Normal</div><div style="font-size:10px;color:var(--text3);">20 questions</div></div>
+      </button>
+      <button class="tmode-btn" id="tmodeTimed" onclick="setTableMode('timed')">
+        <span>⏱</span><div><div style="font-size:12px;font-weight:700;color:var(--white);">Timed</div><div style="font-size:10px;color:var(--text3);">60 seconds</div></div>
+      </button>
+    </div>
+    <button class="btn-scan" onclick="startTables()" style="margin-bottom:10px;">Start Practice ✨</button>
+    <button onclick="goTo('landing')" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;padding:4px;font-family:'Inter',sans-serif;">← Back</button>
+  </div>
+</div>
+
+<div id="tablesGame" class="screen" style="flex-direction:column;background:var(--bg);">
+  <div class="top-bar">
+    <div class="top-bar-brand"><span class="top-bar-logo">Maths<span>Radar</span> <span style="font-weight:400;color:var(--text3);font-size:11px;">Tables</span></span></div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="tProgressText">Q1</span><span id="tProgressPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="tProgressFill" style="width:0%"></div></div>
+    </div>
+    <div class="chips">
+      <div class="chip green" id="tScoreDisplay">⭐ 0</div>
+      <div class="chip streak" id="tStreakDisplay" style="display:none">🔥 0</div>
+      <div class="chip" id="tTimerDisplay" style="display:none">⏱ 60s</div>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="q-card" id="tCard" style="max-width:440px;text-align:center;"></div>
+  </div>
+</div>
+
+<div id="tablesResults" class="screen" style="flex-direction:column;align-items:center;justify-content:center;background:var(--bg);padding:24px;overflow-y:auto;">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:52px;" id="tResultTrophy">🏆</div>
+    <h2 style="color:var(--white);font-size:22px;font-weight:900;margin-top:6px;letter-spacing:-0.5px;" id="tResultTitle">Great work!</h2>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:24px;width:100%;max-width:420px;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px;" id="tResultStats"></div>
+    <div id="tResultBreakdown" style="margin-bottom:18px;max-height:260px;overflow-y:auto;"></div>
+    <button class="btn-scan" onclick="goTo('tables')" style="margin-bottom:8px;">Practice Again ✨</button>
+    <button onclick="goTo('landing')" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;padding:4px;font-family:'Inter',sans-serif;">← Back to Maths Radar</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="screen">
+  <div class="history-header">
+    <button class="btn-back" onclick="goTo('landing')">← Back</button>
+    <h2>📡 Scan History</h2>
+    <p>All past diagnostic scans</p>
+  </div>
+  <div class="history-body" id="historyBody"></div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="celebration" id="celebration">
+  <div class="celebration-card">
+    <span class="celeb-icon" id="celebIcon">⭐</span>
+    <div class="celeb-msg" id="celebMsg">Amazing!</div>
+    <div class="celeb-sub" id="celebSub">First Time Right!</div>
+    <div class="celeb-pts" id="celebPts">+2 points</div>
+    <div class="celeb-streak" id="celebStreak"></div>
+    <button class="btn-celeb" onclick="closeCelebration()">Continue →</button>
+  </div>
+</div>
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+// ── HELPERS ──
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const shuffle=arr=>[...arr].sort(()=>Math.random()-0.5);
+function multOf(n,mn,mx){const m=rnd(mn,mx);return{m,val:n*m};}
+function niceDivision(t,mn=2,mx=12){const m=rnd(mn,mx);return{divisor:t,quotient:m,dividend:t*m};}
+
+// ── NAVIGATION ──
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+  if(id==='tables')initTableSelect();
+  if(id==='history')buildHistory();
+}
+
+// ── SVG HELPERS ──
+function rectSVG(l,w){
+  const sw=260,sh=150,ml=44,mt=28,rw=sw-ml*2,rh=sh-mt*2;
+  return `<svg viewBox="0 0 ${sw} ${sh}" width="${sw}" height="${sh}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="${ml}" y="${mt}" width="${rw}" height="${rh}" fill="rgba(0,229,160,0.06)" stroke="#00e5a0" stroke-width="1.5" stroke-opacity="0.5" rx="3"/>
+    <text x="${sw/2}" y="${mt-8}" text-anchor="middle" font-size="12" font-weight="bold" fill="#8ba3c7">${l} cm</text>
+    <text x="${sw/2}" y="${sh-4}" text-anchor="middle" font-size="12" font-weight="bold" fill="#8ba3c7">${l} cm</text>
+    <text x="${ml-10}" y="${sh/2+4}" text-anchor="middle" font-size="12" font-weight="bold" fill="#8ba3c7" transform="rotate(-90,${ml-10},${sh/2})">${w} cm</text>
+    <text x="${sw-ml+20}" y="${sh/2+4}" text-anchor="middle" font-size="12" font-weight="bold" fill="#8ba3c7" transform="rotate(90,${sw-ml+20},${sh/2})">${w} cm</text>
+  </svg>`;
+}
+function irregularSVG(sides){
+  const pts=[[28,115],[75,28],[178,22],[238,88],[215,158],[55,162]].slice(0,5);
+  const poly=pts.map(p=>p.join(',')).join(' ');
+  const cx=130,cy=95;
+  const mids=pts.map((p,i)=>{const n=pts[(i+1)%pts.length];return[(p[0]+n[0])/2,(p[1]+n[1])/2];});
+  let lbls='';
+  mids.forEach((m,i)=>{const dx=m[0]<cx?-14:14,dy=m[1]<cy?-10:14;lbls+=`<text x="${m[0]+dx}" y="${m[1]+dy}" text-anchor="middle" font-size="11" font-weight="bold" fill="#8ba3c7">${sides[i]}cm</text>`;});
+  return `<svg viewBox="0 0 265 185" width="265" height="185" xmlns="http://www.w3.org/2000/svg"><polygon points="${poly}" fill="rgba(0,229,160,0.06)" stroke="#00e5a0" stroke-width="1.5" stroke-opacity="0.5"/>${lbls}</svg>`;
+}
+function rectilinearSVG(a,b,c,d){
+  const sc=1.4,ox=30,oy=20,W=a*sc,H=b*sc,CW=c*sc,CH=d*sc;
+  const pts=`${ox},${oy} ${ox+W},${oy} ${ox+W},${oy+H-CH} ${ox+W-CW},${oy+H-CH} ${ox+W-CW},${oy+H} ${ox},${oy+H}`;
+  const svgW=W+ox*2+20,svgH=H+oy*2+10;
+  return `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="${pts}" fill="rgba(0,229,160,0.06)" stroke="#00e5a0" stroke-width="1.5" stroke-opacity="0.5"/>
+    <text x="${ox+W/2}" y="${oy-6}" text-anchor="middle" font-size="11" font-weight="bold" fill="#8ba3c7">${a}cm</text>
+    <text x="${ox+W+8}" y="${oy+H/2}" text-anchor="middle" font-size="11" font-weight="bold" fill="#8ba3c7" transform="rotate(90,${ox+W+8},${oy+H/2})">${b}cm</text>
+  </svg>`;
+}
+function pictogramSVG(data,sym,each){
+  const rows=data.length,maxS=Math.max(...data.map(d=>d.count));
+  const cW=32,rH=40,lW=85,pL=7,pT=16,pB=16;
+  const w=lW+pL+maxS*cW+18,h=pT+rows*rH+pB+26;
+  let s='';
+  data.forEach((r,ri)=>{
+    const y=pT+ri*rH+rH/2;
+    s+=`<text x="${lW}" y="${y+5}" text-anchor="end" font-size="11" font-weight="600" fill="#8ba3c7">${r.label}</text>`;
+    for(let i=0;i<r.count;i++) s+=`<text x="${lW+pL+i*cW+cW/2}" y="${y+8}" text-anchor="middle" font-size="17">${sym}</text>`;
+  });
+  s+=`<line x1="${lW+pL}" y1="${pT}" x2="${lW+pL}" y2="${pT+rows*rH}" stroke="#1e3355" stroke-width="1.5"/>`;
+  s+=`<text x="${lW+pL}" y="${pT+rows*rH+20}" font-size="10" fill="#4d6a94">Key: ${sym} = ${each} item${each>1?'s':''}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+function barChartSVG(data,yLbl){
+  const bW=42,gap=14,pL=42,pT=13,pB=40,cH=140;
+  const maxV=Math.max(...data.map(d=>d.val));
+  const sc=cH/maxV,w=pL+data.length*(bW+gap)+gap+6,h=pT+cH+pB;
+  const cols=['#00e5a0','#3b82f6','#f59e0b','#a78bfa','#ef4444'];
+  let bars='',axes='';
+  data.forEach((d,i)=>{
+    const bh=Math.round(d.val*sc),x=pL+gap+i*(bW+gap),y=pT+cH-bh;
+    bars+=`<rect x="${x}" y="${y}" width="${bW}" height="${bh}" fill="${cols[i%cols.length]}" rx="3" opacity="0.8"/>`;
+    bars+=`<text x="${x+bW/2}" y="${y-4}" text-anchor="middle" font-size="10" font-weight="bold" fill="#8ba3c7">${d.val}</text>`;
+    bars+=`<text x="${x+bW/2}" y="${pT+cH+13}" text-anchor="middle" font-size="10" fill="#4d6a94">${d.label}</text>`;
+  });
+  const step=Math.ceil(maxV/4);
+  for(let v=0;v<=maxV;v+=step){
+    const y=pT+cH-v*sc;
+    axes+=`<line x1="${pL-3}" y1="${y}" x2="${w-3}" y2="${y}" stroke="#1e3355" stroke-width="1"/>`;
+    axes+=`<text x="${pL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="#4d6a94">${v}</text>`;
+  }
+  axes+=`<line x1="${pL}" y1="${pT}" x2="${pL}" y2="${pT+cH}" stroke="#1e3355" stroke-width="1.5"/>`;
+  axes+=`<line x1="${pL}" y1="${pT+cH}" x2="${w-3}" y2="${pT+cH}" stroke="#1e3355" stroke-width="1.5"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">${axes}${bars}</svg>`;
+}
+function numberLineSVG(start,end,mark){
+  const w=300,h=55,ml=18,mr=18,y=33,range=end-start,scale=(w-ml-mr)/range;
+  let s=`<line x1="${ml}" y1="${y}" x2="${w-mr}" y2="${y}" stroke="#1e3355" stroke-width="2"/>`;
+  s+=`<polygon points="${w-mr},${y} ${w-mr-7},${y-4} ${w-mr-7},${y+4}" fill="#1e3355"/>`;
+  for(let v=start;v<=end;v++){
+    const x=ml+(v-start)*scale,major=v%5===0||range<=10;
+    s+=`<line x1="${x}" y1="${y-(major?7:4)}" x2="${x}" y2="${y+(major?7:4)}" stroke="#1e3355" stroke-width="${major?2:1}"/>`;
+    if(major||range<=10) s+=`<text x="${x}" y="${y+18}" text-anchor="middle" font-size="10" fill="#4d6a94">${v}</text>`;
+  }
+  if(mark!==undefined){
+    const x=ml+(mark-start)*scale;
+    s+=`<circle cx="${x}" cy="${y}" r="5" fill="#00e5a0" stroke="#00e5a0" stroke-width="2" opacity="0.8"/>`;
+    s+=`<text x="${x}" y="${y-12}" text-anchor="middle" font-size="10" font-weight="bold" fill="#00e5a0">${mark}</text>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+
+// ── RADAR CHART ──
+function drawRadarChart(ctx,topics,scores){
+  const size=320,cx=160,cy=160,r=110;
+  const n=topics.length;
+  ctx.clearRect(0,0,size,size);
+  // Grid circles
+  [0.25,0.5,0.75,1].forEach(f=>{
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const angle=(i/n)*Math.PI*2-Math.PI/2;
+      const x=cx+r*f*Math.cos(angle),y=cy+r*f*Math.sin(angle);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle=`rgba(30,51,85,${0.4+f*0.2})`;
+    ctx.lineWidth=1;ctx.stroke();
+  });
+  // Axes
+  for(let i=0;i<n;i++){
+    const angle=(i/n)*Math.PI*2-Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+r*Math.cos(angle),cy+r*Math.sin(angle));
+    ctx.strokeStyle='rgba(30,51,85,0.6)';ctx.lineWidth=1;ctx.stroke();
+    // Labels
+    const lx=cx+(r+22)*Math.cos(angle),ly=cy+(r+22)*Math.sin(angle);
+    ctx.fillStyle='#4d6a94';ctx.font='600 9px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    const words=topics[i].split(' ');
+    words.forEach((w,wi)=>ctx.fillText(w,lx,ly+(wi-(words.length-1)/2)*11));
+  }
+  // Score fill
+  ctx.beginPath();
+  scores.forEach((s,i)=>{
+    const f=s/100,angle=(i/n)*Math.PI*2-Math.PI/2;
+    const x=cx+r*f*Math.cos(angle),y=cy+r*f*Math.sin(angle);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='rgba(0,229,160,0.12)';ctx.fill();
+  ctx.strokeStyle='#00e5a0';ctx.lineWidth=2;ctx.stroke();
+  // Dots
+  scores.forEach((s,i)=>{
+    const f=s/100,angle=(i/n)*Math.PI*2-Math.PI/2;
+    const x=cx+r*f*Math.cos(angle),y=cy+r*f*Math.sin(angle);
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle='#00e5a0';ctx.fill();
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,229,160,0.3)';ctx.lineWidth=6;ctx.stroke();
+  });
+}
+
+// ── WORKED EXAMPLES ──
+function getWorkedExample(q){
+  if(!q)return'';const o=q.obj||'';
+  if(o.includes('Add 3')||o.includes('Add 4')||o.includes('column addition')){const m=q.text.match(/(\d+)\s*\+\s*(\d+)/);if(m)return`<strong>Column addition</strong>Line up H,T,O and add from right to left. ${m[1]} + ${m[2]} = ${q.answer}`;}
+  if(o.includes('subtraction')||o.includes('Subtract')){const m=q.text.match(/(\d+)\s*[−-]\s*(\d+)/);if(m)return`<strong>Column subtraction</strong>Start from ones, exchange if needed. ${m[1]} − ${m[2]} = ${q.answer}`;}
+  if(o.includes('perimeter')&&(o.includes('rectangle')||o.includes('Rectangle'))){const m=q.text.match(/(\d+)\s*cm.*?(\d+)\s*cm/);if(m)return`<strong>Perimeter of rectangle</strong>${m[1]} + ${m[2]} = ${parseInt(m[1])+parseInt(m[2])}cm, × 2 = ${q.answer}`;}
+  if(o.includes('rectilinear')||o.includes('irregular'))return`<strong>Perimeter: add all sides</strong>Write each side down and add them. Answer: ${q.answer}`;
+  if(o.includes('area')){const m=q.text.match(/(\d+)\s*cm.*?(\d+)\s*cm/);if(m)return`<strong>Area = length × width</strong>${m[1]} × ${m[2]} = ${q.answer}`;}
+  if(o.includes('fraction of')||o.includes('unit fraction')){const m=q.text.match(/1\/(\d+).*?(\d+)/);if(m)return`<strong>Unit fraction</strong>Divide by denominator: ${m[2]} ÷ ${m[1]} = ${q.answer}`;}
+  if(o.includes('non-unit')){const m=q.text.match(/(\d+)\/(\d+).*?(\d+)/);if(m)return`<strong>Non-unit fraction</strong>Find 1/${m[2]} then × ${m[1]} = ${q.answer}`;}
+  if(o.includes('times table')||o.includes('Multiply')||o.includes('multiplication')){const m=q.text.match(/(\d+)\s*[×x]\s*(\d+)/);if(m)return`<strong>Multiplication</strong>${m[1]} × ${m[2]} = ${q.answer}`;}
+  if(o.includes('ivision')){const m=q.text.match(/(\d+)\s*÷\s*(\d+)/);if(m)return`<strong>Division</strong>${m[2]} × ? = ${m[1]} → ${q.answer}`;}
+  if(q.hint)return`<strong>Hint</strong>${q.hint}`;
+  return'';
+}
+
+// ════════════════════════════════════════════
+// YEAR 3 GENERATORS
+// ════════════════════════════════════════════
+const y3generators=[
+  ()=>{const step=pick([4,8,50,100]);const start=rnd(0,5)*step;const seq=[start,start+step,start+2*step,start+3*step];return{topic:'Place Value',obj:'Count in multiples',diff:'easy',type:'input',text:`Fill in the missing number: ${seq[0]}, ${seq[1]}, ${seq[2]}, ___`,hint:`Count on in ${step}s`,answer:String(seq[3]),ftr:2,str:1};},
+  ()=>{const n=rnd(100,900);const op=pick([10,-10,100,-100]);return{topic:'Place Value',obj:'Find 10 or 100 more or less',diff:'easy',type:'input',text:`What is ${op>0?op+' more than':Math.abs(op)+' less than'} ${n}?`,answer:String(n+op),ftr:2,str:1};},
+  ()=>{const h=rnd(1,9),t=rnd(0,9),o=rnd(0,9),n=h*100+t*10+o;const pos=pick(['hundreds','tens','ones']);const digit=pos==='hundreds'?h:pos==='tens'?t:o;const val=pos==='hundreds'?h*100:pos==='tens'?t*10:o;const w=[val===0?1:val*10,val+1,digit+100].filter(x=>x!==val&&x>=0&&x<1000);return{topic:'Place Value',obj:'Recognise place value in 3-digit numbers',diff:'easy',type:'mc',text:`What is the value of the digit ${digit} in the number ${n}?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const a=rnd(100,999),b=rnd(100,999),big=Math.max(a,b),sm=Math.min(a,b);return{topic:'Place Value',obj:'Compare numbers to 1000',diff:'easy',type:'mc',text:`Which correctly compares ${a} and ${b}?`,options:shuffle([`${big} > ${sm}`,`${big} < ${sm}`,`${big} = ${sm}`,`${sm} > ${big}`]),answer:a>b?`${a} > ${b}`:`${b} > ${a}`,ftr:2,str:1};},
+  ()=>{const h=rnd(1,9),t=rnd(1,9),o=rnd(1,9);const hw=['one','two','three','four','five','six','seven','eight','nine'];const tw=['ten','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];const huw=['one hundred','two hundred','three hundred','four hundred','five hundred','six hundred','seven hundred','eight hundred','nine hundred'];return{topic:'Place Value',obj:'Read and write numbers to 1000',diff:'easy',type:'input',text:`Write in digits: "${huw[h-1]} and ${tw[t-1]}-${hw[o-1]}"`,answer:String(h*100+t*10+o),ftr:2,str:1};},
+  ()=>{const h=rnd(1,9),t=rnd(1,9),o=rnd(1,9),n=h*100+t*10+o;return{topic:'Place Value',obj:'Partition 3-digit numbers',diff:'easy',type:'mc',text:`Which correctly partitions ${n}?`,options:shuffle([`${h*100} + ${t*10} + ${o}`,`${h*10} + ${t*100} + ${o}`,`${h} + ${t} + ${o}`,`${h*100} + ${t} + ${o*10}`]),answer:`${h*100} + ${t*10} + ${o}`,ftr:2,str:1};},
+  ()=>{const start=pick([0,100,200,300,400,500]);const mark=start+pick([10,20,30,40,50,60,70,80,90]);return{topic:'Place Value',obj:'Identify numbers on a number line',diff:'medium',type:'input',text:`What number is marked on this number line?`,diagram:numberLineSVG(start,start+100,mark),answer:String(mark),ftr:2,str:1};},
+  ()=>{const base=rnd(100,800),actual=pick([rnd(1,9),pick([10,20,30,40,50,60,70,80,90]),100]);return{topic:'Addition & Subtraction',obj:'Mental addition',diff:'easy',type:'input',text:`Work out mentally: ${base} + ${actual}`,answer:String(base+actual),ftr:2,str:1};},
+  ()=>{const a=rnd(100,499),b=rnd(100,499);return{topic:'Addition & Subtraction',obj:'Column addition up to 3 digits',diff:'easy',type:'input',text:`Column addition: ${a} + ${b}`,answer:String(a+b),ftr:2,str:1,working:true};},
+  ()=>{const b=rnd(100,400),a=b+rnd(10,399);return{topic:'Addition & Subtraction',obj:'Column subtraction up to 3 digits',diff:'medium',type:'input',text:`Column subtraction: ${a} − ${b}`,hint:'Exchange if needed',answer:String(a-b),ftr:2,str:1,working:true};},
+  ()=>{const a=rnd(100,499),b=rnd(100,499),real=a+b,r=Math.round(real/100)*100;let opts=[r,r-100,r+100,r-200].filter(x=>x>0).slice(0,4).map(x=>`About ${x}`);if(!opts.find(o=>o===`About ${r}`))opts[0]=`About ${r}`;return{topic:'Addition & Subtraction',obj:'Estimate answers',diff:'medium',type:'mc',text:`Best estimate for ${a} + ${b}?`,options:shuffle(opts),answer:`About ${r}`,ftr:2,str:1};},
+  ()=>{const total=rnd(300,900),a=rnd(100,total-50);return{topic:'Addition & Subtraction',obj:'Missing number problems',diff:'medium',type:'input',text:`Find the missing number: ${a} + ___ = ${total}`,hint:`${total} − ${a}`,answer:String(total-a),ftr:2,str:1};},
+  ()=>{const a=rnd(120,400),b=rnd(120,400);return{topic:'Addition & Subtraction',obj:'Addition word problems',diff:'medium',type:'input',text:`A school has ${a} boys and ${b} girls. How many children altogether?`,answer:String(a+b),ftr:3,str:1,working:true};},
+  ()=>{const total=rnd(400,900),used=rnd(100,total-50);return{topic:'Addition & Subtraction',obj:'Subtraction word problems',diff:'medium',type:'input',text:`A library has ${total} books. ${used} are borrowed. How many remain?`,answer:String(total-used),ftr:3,str:1,working:true};},
+  ()=>{const{m,val}=multOf(3,2,12);const w=[val-3,val+3,val-6,val+6].filter(x=>x>0&&x!==val);return{topic:'Multiplication & Division',obj:'Recall 3 times table',diff:'easy',type:'mc',text:`What is ${m} × 3?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const{m,val}=multOf(4,2,12);return{topic:'Multiplication & Division',obj:'Recall 4 times table',diff:'easy',type:'input',text:`What is ${m} × 4?`,answer:String(val),ftr:2,str:1};},
+  ()=>{const{m,val}=multOf(8,2,12);const w=[val-8,val+8,val-4,val+4].filter(x=>x>0&&x!==val);return{topic:'Multiplication & Division',obj:'Recall 8 times table',diff:'easy',type:'mc',text:`What is ${m} × 8?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const t=pick([3,4,8]);const{divisor,quotient,dividend}=niceDivision(t);return{topic:'Multiplication & Division',obj:'Division using multiplication facts',diff:'medium',type:'input',text:`Work out: ${dividend} ÷ ${divisor}`,hint:`${divisor} × ? = ${dividend}`,answer:String(quotient),ftr:2,str:1};},
+  ()=>{const a=rnd(11,29),b=pick([3,4,5,6,8]);return{topic:'Multiplication & Division',obj:'Multiply 2-digit by 1-digit',diff:'medium',type:'input',text:`Work out: ${a} × ${b}`,hint:`Partition: (${Math.floor(a/10)*10} × ${b}) + (${a%10} × ${b})`,answer:String(a*b),ftr:3,str:1,working:true};},
+  ()=>{const a=pick([3,4,6,8]),b=pick([3,4,5,6]),prod=a*b,correct=`${a} + ${b} = ${a+b}`;return{topic:'Multiplication & Division',obj:'Fact families',diff:'medium',type:'mc',text:`Which is NOT in the fact family of ${a} × ${b} = ${prod}?`,options:shuffle([`${b} × ${a} = ${prod}`,`${prod} ÷ ${a} = ${b}`,`${prod} ÷ ${b} = ${a}`,correct]),answer:correct,ftr:2,str:1};},
+  ()=>{const boxes=rnd(3,9),each=pick([3,4,5,6,8]);return{topic:'Multiplication & Division',obj:'Multiplication word problems',diff:'hard',type:'input',text:`${boxes} bags with ${each} apples each. How many apples?`,answer:String(boxes*each),ftr:3,str:1,working:true};},
+  ()=>{const start=pick([1,2,3,4,5]);const seq=[start,start+1,start+2].map(x=>`${x}/10`);const next=`${start+3}/10`;return{topic:'Fractions',obj:'Count up in tenths',diff:'easy',type:'mc',text:`What comes next? ${seq.join(', ')}, ___`,options:shuffle([next,`${start+4}/10`,`${start+2}/10`,`${start+3}/11`]),answer:next,ftr:2,str:1};},
+  ()=>{const n=pick([1,2,3,4,5,6,7,8,9,10]);return{topic:'Fractions',obj:'Tenths from dividing by 10',diff:'easy',type:'mc',text:`What is ${n} ÷ 10 as a fraction?`,options:shuffle([`${n}/10`,`${n}/100`,`${n+1}/10`,`${n}/5`]),answer:`${n}/10`,ftr:2,str:1};},
+  ()=>{const d=pick([2,3,4,5,8,10]);const mults=[];for(let i=1;i<=12;i++){if(i*d<=60)mults.push(i*d);}const total=pick(mults);return{topic:'Fractions',obj:'Find unit fractions of amounts',diff:'easy',type:'input',text:`What is 1/${d} of ${total}?`,hint:`Divide ${total} by ${d}`,answer:String(total/d),ftr:2,str:1};},
+  ()=>{const d=pick([3,4,5,8,10]);const mults=[];for(let i=1;i<=10;i++){if(i*d<=80)mults.push(i*d);}const total=pick(mults);const n=rnd(2,d-1);return{topic:'Fractions',obj:'Find non-unit fractions of amounts',diff:'medium',type:'input',text:`What is ${n}/${d} of ${total}?`,hint:`Find 1/${d} first, then × ${n}`,answer:String(Math.round((total/d)*n)),ftr:3,str:1,working:true};},
+  ()=>{const pairs=[['1/2','2/4'],['1/2','3/6'],['1/2','5/10'],['1/3','2/6'],['1/3','3/9'],['2/3','4/6'],['1/4','2/8'],['3/4','6/8']];const[a,b]=pick(pairs);const w=shuffle(['2/5','3/7','4/9','3/5','5/8']).slice(0,3);return{topic:'Fractions',obj:'Equivalent fractions',diff:'medium',type:'mc',text:`Which fraction is equivalent to ${a}?`,options:shuffle([b,...w]),answer:b,ftr:2,str:1};},
+  ()=>{const d=pick([5,6,7,8,9,10]);const n1=rnd(1,d-2),n2=rnd(1,d-1-n1);return{topic:'Fractions',obj:'Add fractions same denominator',diff:'medium',type:'input',text:`Work out: ${n1}/${d} + ${n2}/${d}`,hint:'Add numerators, keep denominator',answer:`${n1+n2}/${d}`,ftr:2,str:1};},
+  ()=>{const d=pick([5,6,7,8,9,10]);const n1=rnd(2,d-1),n2=rnd(1,n1-1);return{topic:'Fractions',obj:'Subtract fractions same denominator',diff:'medium',type:'input',text:`Work out: ${n1}/${d} − ${n2}/${d}`,answer:`${n1-n2}/${d}`,ftr:2,str:1};},
+  ()=>{const set=[['1/2',0.5],['1/3',0.333],['1/4',0.25],['1/6',0.167],['2/3',0.667],['3/4',0.75]];const chosen=shuffle(set).slice(0,4);const smallest=chosen.reduce((a,b)=>b[1]<a[1]?b:a);return{topic:'Fractions',obj:'Compare fractions',diff:'medium',type:'mc',text:`Which fraction is the smallest?`,options:chosen.map(f=>f[0]),answer:smallest[0],ftr:2,str:1};},
+  ()=>{const things=[['a pencil','cm'],['a classroom','m'],['two cities','km'],['a coin','mm'],['a door','m']];const[th,unit]=pick(things);return{topic:'Measurement',obj:'Choose appropriate units',diff:'easy',type:'mc',text:`Which unit for measuring ${th}?`,options:shuffle(['mm','cm','m','km']),answer:unit,ftr:2,str:1};},
+  ()=>{const m=rnd(1,9),cm=rnd(1,99);return{topic:'Measurement',obj:'Convert metres and centimetres',diff:'medium',type:'input',text:`Convert ${m} m and ${cm} cm into centimetres.`,hint:'1 m = 100 cm',answer:String(m*100+cm)+'cm',ftr:2,str:1};},
+  ()=>{const a=rnd(100,500),b=rnd(100,a-10);return{topic:'Measurement',obj:'Compare lengths',diff:'medium',type:'input',text:`A rope is ${a}cm. Another is ${b}cm. How much longer is the first?`,answer:String(a-b)+'cm',ftr:2,str:1};},
+  ()=>{const kg=rnd(1,5),g=pick([100,200,250,500,750]);return{topic:'Measurement',obj:'Convert kg and g',diff:'medium',type:'input',text:`Convert ${kg} kg and ${g} g into grams.`,hint:'1 kg = 1000 g',answer:String(kg*1000+g)+'g',ftr:2,str:1};},
+  ()=>{const l=rnd(1,5);return{topic:'Measurement',obj:'Convert litres to ml',diff:'medium',type:'input',text:`A bucket holds ${l} litre${l>1?'s':''}. How many ml?`,hint:'1 litre = 1000 ml',answer:String(l*1000)+'ml',ftr:2,str:1};},
+  ()=>{const coins=[1,2,5,10,20,50];const c1=pick(coins),c2=pick(coins),c3=pick(coins),tot=c1+c2+c3;const w=[tot+10,tot-5,tot+5].filter(x=>x>0&&x!==tot);return{topic:'Measurement',obj:'Add amounts of money',diff:'easy',type:'mc',text:`Sam has ${c1}p, ${c2}p and ${c3}p coins. Total?`,options:shuffle([tot,...w.slice(0,3)]).map(x=>x+'p'),answer:tot+'p',ftr:2,str:1};},
+  ()=>{const price=pick([35,45,50,55,60,65,70,75,80]);return{topic:'Measurement',obj:'Give change from £1',diff:'medium',type:'input',text:`A pencil costs ${price}p. Paid with £1. Change? (pence)`,answer:String(100-price)+'p',ftr:2,str:1,working:true};},
+  ()=>{const num=pick([2,3,4,5]),each=pick([10,15,20,25]);return{topic:'Measurement',obj:'Multiply to find total cost',diff:'medium',type:'input',text:`${num} rubbers at ${each}p each. Total in pence?`,answer:String(num*each)+'p',ftr:2,str:1};},
+  ()=>{const rNums={'I':1,'II':2,'III':3,'IV':4,'V':5,'VI':6,'VII':7,'VIII':8,'IX':9,'X':10,'XI':11,'XII':12};const rKeys=Object.keys(rNums);const h=pick(rKeys);const m=pick([0,5,10,15,20,25,30]);const hNum=rNums[h];const ts=`${hNum}:${m.toString().padStart(2,'0')}`;const wrong=[`${hNum===12?1:hNum+1}:${m.toString().padStart(2,'0')}`,`${hNum}:${((m+15)%60).toString().padStart(2,'0')}`,`${hNum}:${((m+30)%60).toString().padStart(2,'0')}`];return{topic:'Measurement',obj:'Tell the time (Roman numeral clock)',diff:'easy',type:'mc',text:`Clock shows hour near ${h}, minute at ${m===0?'XII':m/5}. Time?`,options:shuffle([ts,...wrong]),answer:ts,ftr:2,str:1};},
+  ()=>{const sH=rnd(1,4),sM=pick([0,15,30]),dur=pick([20,30,45,60,75]);const tot=sH*60+sM+dur,eH=Math.floor(tot/60)%12||12,eM=tot%60;const ss=`${sH}:${sM.toString().padStart(2,'0')}`,es=`${eH}:${eM.toString().padStart(2,'0')}`;const ds=dur>=60?`${Math.floor(dur/60)} hour ${dur%60>0?dur%60+' minutes':''}`.trim():`${dur} minutes`;return{topic:'Measurement',obj:'Calculate time durations',diff:'medium',type:'input',text:`Show starts at ${ss}, lasts ${ds}. Finish time? (h:mm)`,answer:es,ftr:3,str:1,working:true};},
+  ()=>{const inside=pick([true,false]);let checkT,answer;if(inside){checkT=pick(['9:30 am','10:00 am','10:30 am','11:00 am']);answer='Yes, it is during this time';}else{const out=pick(['8:00 am','8:30 am','12:00 pm','1:00 pm']);checkT=out;const tH=parseInt(out),isPm=out.includes('pm'),tM=(isPm&&tH!==12?tH+12:tH)*60+(out.includes(':30')?30:0);answer=tM<9*60?'No, it is before':'No, it is after';}return{topic:'Measurement',obj:'Use am and pm',diff:'easy',type:'mc',text:`Swimming: 9:00am–11:30am. Is ${checkT} during the session?`,options:shuffle(['Yes, it is during this time','No, it is before','No, it is after']),answer,ftr:2,str:1};},
+  ()=>{const facts=[{q:'Seconds in one minute?',a:'60',w:['30','100','12']},{q:'Days in June?',a:'30',w:['28','29','31']},{q:'Months in a year?',a:'12',w:['10','11','13']}];const f=pick(facts);return{topic:'Measurement',obj:'Time facts',diff:'easy',type:'mc',text:f.q,options:shuffle([f.a,...f.w]),answer:f.a,ftr:2,str:1};},
+  ()=>{const l=rnd(3,14),w=rnd(2,l-1);return{topic:'Geometry',obj:'Perimeter of a rectangle',diff:'medium',type:'input',text:`What is the perimeter of this rectangle?`,diagram:rectSVG(l,w),hint:'2 × (length + width)',answer:String(2*(l+w))+'cm',ftr:3,str:1,working:true};},
+  ()=>{const sides=[rnd(2,8),rnd(2,8),rnd(2,8),rnd(2,8),rnd(2,8)];return{topic:'Geometry',obj:'Perimeter of a 2D shape',diff:'hard',type:'input',text:`What is the perimeter of this shape?`,diagram:irregularSVG(sides),answer:String(sides.reduce((a,b)=>a+b,0))+'cm',ftr:3,str:1,working:true};},
+  ()=>{const s3d=[{name:'Cone',desc:'circular base and a point at top'},{name:'Cylinder',desc:'two circular faces and curved surface'},{name:'Sphere',desc:'no flat faces, perfectly round'},{name:'Cube',desc:'6 equal square faces'},{name:'Square-based pyramid',desc:'4 triangular faces and 1 square base'}];const s=pick(s3d);const w=shuffle(s3d.filter(x=>x.name!==s.name)).slice(0,3).map(x=>x.name);return{topic:'Geometry',obj:'Recognise 3D shapes',diff:'easy',type:'mc',text:`Which 3D shape has ${s.desc}?`,options:shuffle([s.name,...w]),answer:s.name,ftr:2,str:1};},
+  ()=>({topic:'Geometry',obj:'Properties of 3D shapes',diff:'medium',type:'mc',text:'A cube: how many faces, edges and vertices?',options:shuffle(['6 faces, 12 edges, 8 vertices','4 faces, 6 edges, 4 vertices','6 faces, 10 edges, 8 vertices','8 faces, 12 edges, 6 vertices']),answer:'6 faces, 12 edges, 8 vertices',ftr:2,str:1}),
+  ()=>{const q=pick([{q:'How many right angles in a complete turn?',a:'4',w:['2','3','8']},{q:'How many right angles in a half turn?',a:'2',w:['1','3','4']},{q:'Right angles in a three-quarter turn?',a:'3',w:['2','4','6']}]);return{topic:'Geometry',obj:'Right angles and turns',diff:'easy',type:'mc',text:q.q,options:shuffle([q.a,...q.w]),answer:q.a,ftr:2,str:1};},
+  ()=>{const vals={'a right angle':[90],'less than a right angle':[30,45,60,75],'greater than a right angle':[100,120,135,150]};const t=pick(Object.keys(vals));const deg=pick(vals[t]);return{topic:'Geometry',obj:'Identify right angles, acute and obtuse',diff:'easy',type:'mc',text:`An angle of ${deg}° is:`,options:shuffle(['a right angle','less than a right angle','greater than a right angle','a straight line']),answer:t,ftr:2,str:1};},
+  ()=>({topic:'Geometry',obj:'Horizontal and vertical lines',diff:'easy',type:'mc',text:'A perfectly flat left-to-right line is:',options:shuffle(['Vertical','Diagonal','Horizontal','Perpendicular']),answer:'Horizontal',ftr:2,str:1}),
+  ()=>({topic:'Geometry',obj:'Parallel and perpendicular lines',diff:'medium',type:'mc',text:'Two lines meeting at a right angle are:',options:shuffle(['Parallel lines','Perpendicular lines','Diagonal lines','Intersecting lines']),answer:'Perpendicular lines',ftr:2,str:1}),
+  ()=>{const sym=pick(['⭐','🍎','🐶','🌟','🏆']);const each=pick([2,5,10]);const days=[{label:'Mon',count:rnd(1,6)},{label:'Tue',count:rnd(1,6)},{label:'Wed',count:rnd(1,6)},{label:'Thu',count:rnd(1,5)}];const ask=pick(days);const ans=ask.count*each;const w=[ans-each,ans+each,ans+each*2].filter(x=>x>0&&x!==ans);return{topic:'Statistics',obj:'Read pictograms',diff:'easy',type:'mc',text:`Each ${sym} = ${each} books. How many on ${ask.label}?`,diagram:pictogramSVG(days,sym,each),options:shuffle([ans,...w.slice(0,3)]).map(String),answer:String(ans),ftr:2,str:1};},
+  ()=>{const lbls=['Mon','Tue','Wed','Thu','Fri'].slice(0,pick([3,4,5]));const vals=lbls.map(()=>rnd(3,18));const data=lbls.map((l,i)=>({label:l,val:vals[i]}));return{topic:'Statistics',obj:'Interpret bar charts',diff:'medium',type:'input',text:`Total children across all days shown?`,diagram:barChartSVG(data,'Children'),answer:String(vals.reduce((a,b)=>a+b,0)),ftr:2,str:1,working:true};},
+  ()=>{const cols=['Red','Blue','Green','Yellow'];const ch=shuffle(cols).slice(0,3);const vals=ch.map(()=>rnd(5,28));const mx=Math.max(...vals),mn=Math.min(...vals);return{topic:'Statistics',obj:'Read tables',diff:'medium',type:'input',text:`Colours: ${ch.map((c,i)=>c+' = '+vals[i]).join(', ')}. Difference between most and least popular?`,answer:String(mx-mn),ftr:3,str:1,working:true};},
+  ()=>{const all=[['1/2 of 8','4'],['1/4 of 12','3'],['1/3 of 9','3'],['1/2 of 20','10'],['1/4 of 16','4'],['1/3 of 12','4'],['1/2 of 14','7'],['1/4 of 20','5']];return{topic:'Fractions',obj:'Match fraction calculations',diff:'medium',type:'match',text:'Match each calculation to its answer.',pairs:shuffle(all).slice(0,4),ftr:4,str:2};},
+  ()=>({topic:'Geometry',obj:'Match 3D shapes to descriptions',diff:'medium',type:'match',text:'Match each description to the correct 3D shape.',pairs:[['6 equal square faces','Cube'],['2 circular faces, curved surface','Cylinder'],['4 triangular faces, 1 square base','Square-based pyramid'],['No flat faces, perfectly round','Sphere']],ftr:4,str:2}),
+  ()=>{const t=rnd(2,5),h=t*2,off=rnd(1,h-1),o=h-off;return{topic:'Place Value',obj:'CHALLENGE: Reason about place value',diff:'challenge',type:'input',text:`CHALLENGE: My hundreds = double my tens. My tens = ${t}. My ones = ${off} less than my hundreds. What number am I?`,answer:String(h*100+t*10+o),ftr:4,str:2,working:true};},
+  ()=>{const trays=rnd(3,8),each=pick([3,4,6,8]),total=trays*each,d=pick([2,4]);return{topic:'Multiplication & Division',obj:'CHALLENGE: Multi-step problem',diff:'challenge',type:'input',text:`CHALLENGE: ${trays} trays of ${each} cakes. 1/${d} are sold. How many sold?`,answer:String(total/d),ftr:4,str:2,working:true};},
+  ()=>{const d=pick([6,7,8,9,10]);const n1=rnd(1,d-2),n2=rnd(1,d-1-n1);return{topic:'Fractions',obj:'CHALLENGE: Reason with fractions',diff:'challenge',type:'input',text:`CHALLENGE: Pizza cut into ${d} slices. Sam eats ${n1}, sister eats ${n2}. Fraction left?`,answer:`${d-n1-n2}/${d}`,ftr:3,str:1,working:true};},
+  ()=>{const p=pick([24,28,32,36,40]);const l=rnd(p/4+1,p/2-1),w=p/2-l;return{topic:'Geometry',obj:'CHALLENGE: Find missing side',diff:'challenge',type:'input',text:`CHALLENGE: Rectangle perimeter = ${p}cm. One side = ${l}cm. Other side?`,answer:String(w)+'cm',ftr:4,str:2,working:true};},
+  ()=>{const scores=[rnd(8,25),rnd(8,25),rnd(8,25)];const names=['Alex','Beth','Carlos'];const sum=scores.reduce((a,b)=>a+b,0);return{topic:'Statistics',obj:'CHALLENGE: Calculate the mean',diff:'challenge',type:'input',text:`CHALLENGE: Scores — ${names.map((n,i)=>n+' = '+scores[i]).join(', ')}. Mean score?`,answer:String(Math.round(sum/3)),ftr:4,str:2,working:true};}
+];
+
+// ════════════════════════════════════════════
+// YEAR 4 GENERATORS
+// ════════════════════════════════════════════
+const y4generators=[
+  ()=>{const step=pick([6,7,9,25,1000]);const start=rnd(0,5)*step;const seq=[start,start+step,start+2*step,start+3*step];return{topic:'Place Value',obj:'Count in multiples of 6, 7, 9, 25 or 1000',diff:'easy',type:'input',text:`Fill in: ${seq[0]}, ${seq[1]}, ${seq[2]}, ___`,answer:String(seq[3]),ftr:2,str:1};},
+  ()=>{const n=rnd(1000,8000);const op=pick([1000,-1000]);return{topic:'Place Value',obj:'Find 1000 more or less',diff:'easy',type:'input',text:`What is ${op>0?'1000 more than':'1000 less than'} ${n}?`,answer:String(n+op),ftr:2,str:1};},
+  ()=>{const n=rnd(1000,9999);const th=Math.floor(n/1000),h=Math.floor((n%1000)/100),t=Math.floor((n%100)/10),o=n%10;const pos=pick(['thousands','hundreds','tens','ones']);const digit=pos==='thousands'?th:pos==='hundreds'?h:pos==='tens'?t:o;const val=pos==='thousands'?th*1000:pos==='hundreds'?h*100:pos==='tens'?t*10:o;const w=[val===0?1000:val*2,val+1,Math.max(0,val-10)].filter(x=>x!==val&&x>=0&&x<10000);return{topic:'Place Value',obj:'Place value in 4-digit numbers',diff:'easy',type:'mc',text:`Value of digit ${digit} in ${n}?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const start=pick([-5,-4,-3,-2,-1,0,1]);return{topic:'Place Value',obj:'Count through zero',diff:'medium',type:'input',text:`Next: ${start}, ${start+1}, ${start+2}, ${start+3}, ___`,answer:String(start+4),ftr:2,str:1};},
+  ()=>{const n=rnd(100,9990);const r=Math.round(n/10)*10;const w=[r-10,r+10,r+20].filter(x=>x!==r&&x>=0);return{topic:'Place Value',obj:'Round to nearest 10',diff:'easy',type:'mc',text:`Round ${n} to nearest 10.`,options:shuffle([r,...w.slice(0,3)]).map(String),answer:String(r),ftr:2,str:1};},
+  ()=>{const n=rnd(100,9900);const r=Math.round(n/100)*100;const w=[r-100,r+100,r+200].filter(x=>x!==r&&x>=0);return{topic:'Place Value',obj:'Round to nearest 100',diff:'easy',type:'mc',text:`Round ${n} to nearest 100.`,options:shuffle([r,...w.slice(0,3)]).map(String),answer:String(r),ftr:2,str:1};},
+  ()=>{const n=rnd(1000,9000);const r=Math.round(n/1000)*1000;const w=[r-1000,r+1000,r+2000].filter(x=>x!==r&&x>=0);return{topic:'Place Value',obj:'Round to nearest 1000',diff:'medium',type:'mc',text:`Round ${n} to nearest 1000.`,options:shuffle([r,...w.slice(0,3)]).map(String),answer:String(r),ftr:2,str:1};},
+  ()=>{const rMap={1:'I',2:'II',3:'III',4:'IV',5:'V',6:'VI',7:'VII',8:'VIII',9:'IX',10:'X',11:'XI',12:'XII',14:'XIV',15:'XV',19:'XIX',20:'XX',30:'XXX',40:'XL',50:'L',60:'LX',70:'LXX',80:'LXXX',90:'XC',100:'C'};const nums=Object.keys(rMap).map(Number);const n=pick(nums);const w=shuffle(nums.filter(x=>x!==n)).slice(0,3);if(pick([true,false])){return{topic:'Place Value',obj:'Read Roman numerals to 100',diff:'medium',type:'mc',text:`${rMap[n]} as an ordinary number?`,options:shuffle([n,...w]).map(String),answer:String(n),ftr:2,str:1};}else{return{topic:'Place Value',obj:'Write Roman numerals to 100',diff:'medium',type:'mc',text:`Write ${n} as a Roman numeral.`,options:shuffle([rMap[n],...w.map(x=>rMap[x])]),answer:rMap[n],ftr:2,str:1};}},
+  ()=>{const a=rnd(1000,4999),b=rnd(1000,4999);return{topic:'Addition & Subtraction',obj:'Add 4-digit numbers',diff:'easy',type:'input',text:`Column addition: ${a} + ${b}`,answer:String(a+b),ftr:2,str:1,working:true};},
+  ()=>{const b=rnd(1000,3999),a=b+rnd(100,3999);return{topic:'Addition & Subtraction',obj:'Subtract 4-digit numbers',diff:'medium',type:'input',text:`Column subtraction: ${a} − ${b}`,answer:String(a-b),ftr:2,str:1,working:true};},
+  ()=>{const a=rnd(1000,4999),b=rnd(1000,a-100);return{topic:'Addition & Subtraction',obj:'Multi-step word problems',diff:'hard',type:'input',text:`Stadium holds ${a}. ${b} attended Saturday. Sunday: 250 more than Saturday. Total weekend attendance?`,hint:`Sunday = ${b}+250, then add both`,answer:String(b+(b+250)),ftr:4,str:2,working:true};},
+  ()=>{const{m,val}=multOf(6,2,12);const w=[val-6,val+6,val-3,val+3].filter(x=>x>0&&x!==val);return{topic:'Multiplication & Division',obj:'Recall 6 times table',diff:'easy',type:'mc',text:`${m} × 6?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const{m,val}=multOf(7,2,12);return{topic:'Multiplication & Division',obj:'Recall 7 times table',diff:'easy',type:'input',text:`${m} × 7?`,answer:String(val),ftr:2,str:1};},
+  ()=>{const{m,val}=multOf(9,2,12);const w=[val-9,val+9,val-3].filter(x=>x>0&&x!==val);return{topic:'Multiplication & Division',obj:'Recall 9 times table',diff:'easy',type:'mc',text:`${m} × 9?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const{m,val}=multOf(11,2,12);return{topic:'Multiplication & Division',obj:'Recall 11 times table',diff:'easy',type:'input',text:`${m} × 11?`,answer:String(val),ftr:2,str:1};},
+  ()=>{const{m,val}=multOf(12,2,12);const w=[val-12,val+12,val-6].filter(x=>x>0&&x!==val);return{topic:'Multiplication & Division',obj:'Recall 12 times table',diff:'easy',type:'mc',text:`${m} × 12?`,options:shuffle([val,...w.slice(0,3)]).map(String),answer:String(val),ftr:2,str:1};},
+  ()=>{const a=rnd(100,299),b=pick([3,4,6,7,8,9]);return{topic:'Multiplication & Division',obj:'Short multiplication (3-digit × 1-digit)',diff:'medium',type:'input',text:`Short multiplication: ${a} × ${b}`,answer:String(a*b),ftr:3,str:1,working:true};},
+  ()=>{const b=pick([3,4,6,7,8,9]),q=rnd(10,20),a=b*q;return{topic:'Multiplication & Division',obj:'Short division (2-digit ÷ 1-digit)',diff:'medium',type:'input',text:`Short division: ${a} ÷ ${b}`,answer:String(q),ftr:2,str:1,working:true};},
+  ()=>{const b=pick([3,4,6,7,8,9]),q=rnd(10,99),a=b*q;return{topic:'Multiplication & Division',obj:'Short division (3-digit ÷ 1-digit)',diff:'hard',type:'input',text:`Short division: ${a} ÷ ${b}`,answer:String(q),ftr:3,str:1,working:true};},
+  ()=>{const a=rnd(4,9),b=rnd(10,25);return{topic:'Multiplication & Division',obj:'Multiplication word problems',diff:'hard',type:'input',text:`${a} classes, ${b} pupils each. Total?`,answer:String(a*b),ftr:3,str:1,working:true};},
+  ()=>{const n=rnd(1,8);const seq=[n,n+1,n+2].map(x=>`${x}/100`);const next=`${n+3}/100`;return{topic:'Fractions & Decimals',obj:'Count in hundredths',diff:'medium',type:'mc',text:`Next: ${seq.join(', ')}, ___`,options:shuffle([next,`${n+4}/100`,`${n+2}/100`,`${n+3}/10`]),answer:next,ftr:2,str:1};},
+  ()=>{const n=rnd(1,99);return{topic:'Fractions & Decimals',obj:'Recognise hundredths',diff:'medium',type:'mc',text:`${n} ÷ 100 as a fraction?`,options:shuffle([`${n}/100`,`${n}/10`,`${n+1}/100`,`${n}/1000`]),answer:`${n}/100`,ftr:2,str:1};},
+  ()=>{const n=rnd(1,9);const dec=(n/10).toFixed(1);return{topic:'Fractions & Decimals',obj:'Decimal equivalents of tenths',diff:'medium',type:'mc',text:`${n}/10 as a decimal?`,options:shuffle([dec,(n/10+0.1).toFixed(1),(n/10-0.1>0?(n/10-0.1).toFixed(1):'0.9'),(n*10).toString()]),answer:dec,ftr:2,str:1};},
+  ()=>{const pairs=[['1/4','0.25'],['1/2','0.5'],['3/4','0.75'],['1/10','0.1'],['1/100','0.01']];const[f,d]=pick(pairs);return{topic:'Fractions & Decimals',obj:'Decimal equivalents of fractions',diff:'medium',type:'mc',text:`${f} as a decimal?`,options:shuffle([d,...['0.4','0.15','0.35','0.6','0.05'].filter(x=>x!==d).slice(0,3)]),answer:d,ftr:2,str:1};},
+  ()=>{const d=pick([3,4,5,8,10]);const mults=[];for(let i=1;i<=10;i++){if(i*d<=80)mults.push(i*d);}const total=pick(mults);const n=rnd(2,d-1);return{topic:'Fractions & Decimals',obj:'Non-unit fractions of amounts',diff:'medium',type:'input',text:`${n}/${d} of ${total}?`,hint:`1/${d} first, then × ${n}`,answer:String(Math.round((total/d)*n)),ftr:3,str:1,working:true};},
+  ()=>{const d=rnd(5,10);const n1=rnd(1,d-2),n2=rnd(1,d-1-n1);return{topic:'Fractions & Decimals',obj:'Add fractions same denominator',diff:'medium',type:'input',text:`${n1}/${d} + ${n2}/${d} = ?`,answer:`${n1+n2}/${d}`,ftr:2,str:1};},
+  ()=>{const pairs=[['1/2','2/4'],['1/2','3/6'],['1/3','2/6'],['1/4','2/8'],['2/3','4/6'],['3/4','6/8'],['2/5','4/10']];const[a,b]=pick(pairs);const w=shuffle(['2/5','3/7','4/9','1/6','3/5']).filter(x=>x!==b).slice(0,3);return{topic:'Fractions & Decimals',obj:'Equivalent fractions',diff:'hard',type:'mc',text:`Equivalent to ${a}?`,options:shuffle([b,...w]),answer:b,ftr:2,str:1};},
+  ()=>{const d=(rnd(10,99)/10).toFixed(1);const r=Math.round(parseFloat(d));const w=[r+1,r-1>=0?r-1:r+2].filter(x=>x!==r);return{topic:'Fractions & Decimals',obj:'Round decimals to nearest whole',diff:'medium',type:'mc',text:`Round ${d} to nearest whole number.`,options:shuffle([r,...w.slice(0,3)]).map(String),answer:String(r),ftr:2,str:1};},
+  ()=>{const km=rnd(1,9);return{topic:'Measurement',obj:'Convert km to m',diff:'medium',type:'input',text:`${km} km in metres?`,hint:'1 km = 1000 m',answer:String(km*1000)+'m',ftr:2,str:1};},
+  ()=>{const kg=rnd(1,5);return{topic:'Measurement',obj:'Convert kg to g',diff:'medium',type:'input',text:`${kg} kg in grams?`,hint:'1 kg = 1000 g',answer:String(kg*1000)+'g',ftr:2,str:1};},
+  ()=>{const l=rnd(1,5);return{topic:'Measurement',obj:'Convert litres to ml',diff:'medium',type:'input',text:`${l} litre${l>1?'s':''} in ml?`,answer:String(l*1000)+'ml',ftr:2,str:1};},
+  ()=>{const cm=rnd(1,20);return{topic:'Measurement',obj:'Convert cm to mm',diff:'easy',type:'input',text:`${cm} cm in mm?`,hint:'1 cm = 10 mm',answer:String(cm*10)+'mm',ftr:2,str:1};},
+  ()=>{const a=rnd(4,10),b=rnd(3,8),c=rnd(2,a-1),d=rnd(2,b-1);return{topic:'Measurement',obj:'Perimeter of rectilinear shapes',diff:'hard',type:'input',text:`Perimeter of this rectilinear shape?`,diagram:rectilinearSVG(a,b,c,d),answer:String(2*a+2*b)+'cm',ftr:3,str:1,working:true};},
+  ()=>{const l=rnd(3,12),w=rnd(2,l-1);return{topic:'Measurement',obj:'Area of rectangles',diff:'medium',type:'input',text:`Area of this rectangle?`,diagram:rectSVG(l,w),hint:'Area = length × width',answer:String(l*w)+'cm²',ftr:3,str:1,working:true};},
+  ()=>{const h=rnd(13,23),m=pick([0,15,30,45]);const h12=h-12;return{topic:'Measurement',obj:'24-hour clock',diff:'medium',type:'mc',text:`Clock shows ${h}:${m.toString().padStart(2,'0')}. In 12-hour?`,options:shuffle([`${h12}:${m.toString().padStart(2,'0')} pm`,`${h12+1}:${m.toString().padStart(2,'0')} pm`,`${h12}:${((m+15)%60).toString().padStart(2,'0')} pm`,`${h}:${m.toString().padStart(2,'0')} am`]),answer:`${h12}:${m.toString().padStart(2,'0')} pm`,ftr:2,str:1};},
+  ()=>{const q=pick([{q:'One pair of parallel sides only?',a:'Trapezium',w:['Square','Rectangle','Rhombus']},{q:'4 right angles and 4 equal sides?',a:'Square',w:['Rectangle','Trapezium','Parallelogram']},{q:'2 pairs of parallel sides, no right angles?',a:'Parallelogram',w:['Square','Rectangle','Trapezium']}]);return{topic:'Geometry',obj:'Classify quadrilaterals',diff:'medium',type:'mc',text:q.q,options:shuffle([q.a,...q.w]),answer:q.a,ftr:2,str:1};},
+  ()=>{const q=pick([{q:'3 equal sides?',a:'Equilateral triangle',w:['Isosceles triangle','Scalene triangle','Right-angled triangle']},{q:'2 equal sides?',a:'Isosceles triangle',w:['Equilateral triangle','Scalene triangle','Right-angled triangle']},{q:'No equal sides?',a:'Scalene triangle',w:['Equilateral triangle','Isosceles triangle','Right-angled triangle']}]);return{topic:'Geometry',obj:'Classify triangles',diff:'medium',type:'mc',text:q.q,options:shuffle([q.a,...q.w]),answer:q.a,ftr:2,str:1};},
+  ()=>{const deg=rnd(10,179);const ans=deg<90?'Acute':deg===90?'Right angle':'Obtuse';const w=['Acute','Right angle','Obtuse','Reflex'].filter(x=>x!==ans);return{topic:'Geometry',obj:'Identify acute and obtuse angles',diff:'easy',type:'mc',text:`An angle of ${deg}° is:`,options:shuffle([ans,...w.slice(0,3)]),answer:ans,ftr:2,str:1};},
+  ()=>{const shapes=[{name:'square',sym:4},{name:'rectangle',sym:2},{name:'equilateral triangle',sym:3},{name:'regular hexagon',sym:6},{name:'isosceles triangle',sym:1},{name:'regular pentagon',sym:5}];const s=pick(shapes);const w=[s.sym-1,s.sym+1,s.sym+2].filter(x=>x>=0&&x!==s.sym);return{topic:'Geometry',obj:'Lines of symmetry',diff:'medium',type:'mc',text:`Lines of symmetry in a ${s.name}?`,options:shuffle([s.sym,...w.slice(0,3)]).map(String),answer:String(s.sym),ftr:2,str:1};},
+  ()=>{const x=rnd(1,8),y=rnd(1,8);return{topic:'Geometry',obj:'Coordinates in first quadrant',diff:'medium',type:'mc',text:`${x} across, ${y} up from origin. Coordinates?`,options:shuffle([`(${x},${y})`,`(${y},${x})`,`(${x+1},${y})`,`(${x},${y+1})`]),answer:`(${x},${y})`,ftr:2,str:1};},
+  ()=>{const x=rnd(1,5),y=rnd(1,5),dx=rnd(1,4),dy=rnd(1,4);return{topic:'Geometry',obj:'Translations',diff:'hard',type:'mc',text:`Shape at (${x},${y}). Moves ${dx} right, ${dy} up. New position?`,options:shuffle([`(${x+dx},${y+dy})`,`(${x+dy},${y+dx})`,`(${x+dx+1},${y+dy})`,`(${x+dx},${y+dy+1})`]),answer:`(${x+dx},${y+dy})`,ftr:2,str:1};},
+  ()=>{const sym=pick(['🌟','🍕','🎈','🐱']);const each=pick([2,5,10]);const cats=['Reading','Sport','Art','Music'].slice(0,pick([3,4]));const data=cats.map(c=>({label:c,count:rnd(1,7)}));const ask=pick(data);const ans=ask.count*each;const w=[ans-each,ans+each,ask.count].filter(x=>x>0&&x!==ans);return{topic:'Statistics',obj:'Read pictograms',diff:'easy',type:'mc',text:`Each ${sym} = ${each} votes. ${ask.label} votes?`,diagram:pictogramSVG(data,sym,each),options:shuffle([ans,...w.slice(0,3)]).map(String),answer:String(ans),ftr:2,str:1};},
+  ()=>{const lbls=['Mon','Tue','Wed','Thu','Fri'].slice(0,pick([3,4,5]));const vals=lbls.map(()=>rnd(5,22));const data=lbls.map((l,i)=>({label:l,val:vals[i]}));const max=Math.max(...vals);const maxDay=data.find(d=>d.val===max).label;return{topic:'Statistics',obj:'Interpret bar charts',diff:'medium',type:'mc',text:`Which day had the most?`,diagram:barChartSVG(data,'Amount'),options:shuffle(lbls),answer:maxDay,ftr:2,str:1};},
+  ()=>{const cols=['Red','Blue','Green','Yellow','Purple'].slice(0,pick([3,4]));const vals=cols.map(()=>rnd(4,24));return{topic:'Statistics',obj:'Read tables',diff:'medium',type:'input',text:`${cols.map((c,i)=>c+' = '+vals[i]).join(', ')}. Total?`,answer:String(vals.reduce((a,b)=>a+b,0)),ftr:2,str:1,working:true};},
+  ()=>{const all=[['2/4','1/2'],['4/6','2/3'],['6/8','3/4'],['2/6','1/3'],['4/8','1/2'],['3/6','1/2'],['4/10','2/5'],['6/10','3/5']];return{topic:'Fractions & Decimals',obj:'Match equivalent fractions',diff:'medium',type:'match',text:'Match each fraction to its simplest form.',pairs:shuffle(all).slice(0,4),ftr:4,str:2};},
+  ()=>{const rMap={1:'I',4:'IV',5:'V',9:'IX',10:'X',14:'XIV',40:'XL',50:'L',90:'XC',100:'C'};const nums=Object.keys(rMap).map(Number);const chosen=shuffle(nums).slice(0,4);return{topic:'Place Value',obj:'Match Roman numerals',diff:'medium',type:'match',text:'Match each number to its Roman numeral.',pairs:chosen.map(n=>[String(n),rMap[n]]),ftr:4,str:2};},
+  ()=>{const a=rnd(2000,5000),b=rnd(1000,a-500);return{topic:'Addition & Subtraction',obj:'CHALLENGE: Multi-step',diff:'challenge',type:'input',text:`CHALLENGE: ${a} books, ${b} fiction. 125 non-fiction removed. Non-fiction remaining?`,answer:String(a-b-125),ftr:4,str:2,working:true};},
+  ()=>{const a=rnd(3,9),b=rnd(100,299);return{topic:'Multiplication & Division',obj:'CHALLENGE: Short multiplication',diff:'challenge',type:'input',text:`CHALLENGE: ${a} shelves, ${b} books each. Total?`,answer:String(a*b),ftr:4,str:2,working:true};},
+  ()=>{const d=pick([4,5,8,10]);const mults=[];for(let i=2;i<=10;i++){if(i*d<=80)mults.push(i*d);}const total=pick(mults);const n=rnd(2,d-1);return{topic:'Fractions & Decimals',obj:'CHALLENGE: Non-unit fractions',diff:'challenge',type:'input',text:`CHALLENGE: ${total} marbles, ${n}/${d} are blue. How many blue?`,answer:String(Math.round((total/d)*n)),ftr:4,str:2,working:true};},
+  ()=>{const l=rnd(4,12),w=rnd(3,l-1);const q=pick([true,false]);return{topic:'Measurement',obj:'CHALLENGE: Perimeter and area',diff:'challenge',type:'input',text:`CHALLENGE: Rectangle ${l}cm × ${w}cm. ${q?'Perimeter':'Area'}?`,answer:String(q?2*(l+w):l*w)+(q?'cm':'cm²'),ftr:4,str:2,working:true};},
+  ()=>{const scores=[rnd(10,30),rnd(10,30),rnd(10,30),rnd(10,30)];const names=['Amir','Bella','Carlos','Dani'];const sum=scores.reduce((a,b)=>a+b,0);return{topic:'Statistics',obj:'CHALLENGE: Mean average',diff:'challenge',type:'input',text:`CHALLENGE: Scores — ${names.map((n,i)=>n+': '+scores[i]).join(', ')}. Mean?`,answer:String(Math.round(sum/4)),ftr:4,str:2,working:true};}
+];
+
+// ── STATE ──
+let QUESTIONS=[],selectedMode=10,selectedYear=3;
+let state={idx:0,score:0,ftrScore:0,strScore:0,ftrCount:0,answers:[],studentName:'',attempts:0,awaitingNext:false,matchScore:0,streak:0,maxStreak:0,qTimes:[],qStart:0};
+let matchLeftSel=null,matchRightSel=null,timerInterval=null;
+
+function setYear(y){selectedYear=y;document.getElementById('btnY3').classList.toggle('active',y===3);document.getElementById('btnY4').classList.toggle('active',y===4);}
+function setMode(m){
+  selectedMode=m;
+  document.getElementById('mode10').classList.toggle('active',m===10);
+  document.getElementById('mode20').classList.toggle('active',m===20);
+  document.getElementById('modeFull').classList.toggle('active',m==='full');
+}
+
+function generateQuestions(){
+  const gens=selectedYear===4?y4generators:y3generators;
+  const all=gens.map(g=>{try{return g();}catch(e){console.error(e);return null;}}).filter(Boolean);
+  if(selectedMode==='full'){QUESTIONS=all;return;}
+  const byTopic={};
+  all.forEach(q=>{if(!byTopic[q.topic])byTopic[q.topic]=[];byTopic[q.topic].push(q);});
+  const topics=Object.keys(byTopic);
+  const picked=[];let pass=0;
+  while(picked.length<selectedMode&&pass<30){
+    for(const t of topics){if(picked.length>=selectedMode)break;const used=picked.filter(q=>q.topic===t).length;if(byTopic[t][used])picked.push(byTopic[t][used]);}
+    pass++;
+  }
+  QUESTIONS=picked.slice(0,selectedMode);
+}
+
+function startAssessment(){
+  state={idx:0,score:0,ftrScore:0,strScore:0,ftrCount:0,answers:[],
+    studentName:document.getElementById('studentName').value.trim()||'Student',
+    attempts:0,awaitingNext:false,matchScore:0,streak:0,maxStreak:0,qTimes:[],qStart:Date.now()};
+  generateQuestions();
+  goTo('assessment');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q=QUESTIONS[state.idx];if(!q){nextQuestion();return;}
+  state.attempts=0;state.awaitingNext=false;state.matchScore=0;
+  matchLeftSel=null;matchRightSel=null;state.qStart=Date.now();
+  updateTopBar();
+  const card=document.getElementById('qCard');
+  card.innerHTML='';card.style.animation='none';
+  requestAnimationFrame(()=>{card.style.animation='';});
+  const dm={easy:'diff-easy',medium:'diff-medium',hard:'diff-hard',challenge:'diff-challenge'};
+  const dl={easy:'Fluency',medium:'Reasoning',hard:'Problem Solving',challenge:'Challenge'};
+  let html=`<div class="q-meta"><span class="q-num">Q${state.idx+1} of ${QUESTIONS.length}</span><span class="diff-pill ${dm[q.diff]||'diff-easy'}">${dl[q.diff]||q.diff}</span><span class="q-timer" id="qTimer">⏱ 0s</span></div>
+  <div class="q-text">${q.text}</div>`;
+  if(q.diagram)html+=`<div class="diagram">${q.diagram}</div>`;
+  if(q.type==='mc')html+=renderMC(q);
+  else if(q.type==='input')html+=renderInput();
+  else if(q.type==='match')html+=`<div style="margin-bottom:10px;font-size:12px;color:var(--text3);">Tap a left item, then tap its match on the right.</div>`+renderMatch(q);
+  html+=`<div class="feedback-box" id="feedbackBox"><span class="feedback-icon" id="fbIcon"></span><div class="feedback-text"><strong id="fbTitle"></strong><span id="fbMsg"></span></div></div>`;
+  html+=`<button class="btn-next" id="btnNext" onclick="nextQuestion()">Next →</button>`;
+  if(q.working)html+=`<div class="working-area"><label>Working out</label><textarea placeholder="Show your working..."></textarea></div>`;
+  card.innerHTML=html;
+  startQTimer();
+}
+
+function startQTimer(){clearInterval(timerInterval);let s=0;timerInterval=setInterval(()=>{s++;const el=document.getElementById('qTimer');if(el)el.textContent=`⏱ ${s}s`;},1000);}
+function stopQTimer(){clearInterval(timerInterval);return Math.round((Date.now()-state.qStart)/1000);}
+
+function renderMC(q){const l=['A','B','C','D'];return `<div class="mc-grid">${q.options.map((o,i)=>`<button class="mc-opt" id="opt${i}" onclick="checkMC(${i})"><span class="opt-letter">${l[i]}</span> ${o}</button>`).join('')}</div>`;}
+function renderInput(){return `<div class="input-row"><input type="text" class="q-input" id="qInput" placeholder="Answer..." onkeydown="if(event.key==='Enter')checkInput()"/><button class="btn-check" id="btnCheck" onclick="checkInput()">✓</button></div>`;}
+function renderMatch(q){
+  const lefts=q.pairs.map(p=>p[0]),rights=shuffle(q.pairs.map(p=>p[1]));
+  return `<div class="match-grid"><div class="match-col"><h4>Match from</h4>${lefts.map((l,i)=>`<div class="match-item" id="mL${i}" data-val="${esc(l)}" onclick="selectMatch('left',${i})">${l}</div>`).join('')}</div><div class="match-col"><h4>Match to</h4>${rights.map((r,i)=>`<div class="match-item" id="mR${i}" data-val="${esc(r)}" onclick="selectMatch('right',${i})">${r}</div>`).join('')}</div></div>`;
+}
+function esc(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+function checkMC(idx){
+  if(state.awaitingNext)return;
+  const q=QUESTIONS[state.idx],chosen=q.options[idx],correct=q.answer;
+  document.querySelectorAll('.mc-opt').forEach(b=>b.disabled=true);
+  q.options.forEach((o,i)=>{if(o===correct)document.getElementById('opt'+i).classList.add('correct');});
+  if(chosen!==correct)document.getElementById('opt'+idx).classList.add('wrong');
+  handleResult(chosen===correct,q);
+}
+function checkInput(){
+  if(state.awaitingNext)return;
+  const q=QUESTIONS[state.idx],inp=document.getElementById('qInput'),btn=document.getElementById('btnCheck');
+  if(!inp||!inp.value.trim())return;
+  const ok=checkAnswer(inp.value.trim(),q.answer);
+  inp.classList.add(ok?'correct':'wrong');btn.disabled=true;
+  handleResult(ok,q);
+}
+function checkAnswer(given,correct){
+  const norm=s=>String(s).toLowerCase().replace(/\s/g,'').replace(/p$/,'').replace(/cm²/,'cm2').replace(/²/,'2').replace(/cm$/,'').replace(/mm$/,'').replace(/ml$/,'').replace(/kg$/,'').replace(/[mg]$/,'').replace(/£/,'');
+  const g=norm(given),c=norm(correct);
+  if(g===c)return true;
+  if(String(given).toLowerCase().replace(/\s/g,'')=== String(correct).toLowerCase().replace(/\s/g,''))return true;
+  const gn=parseFloat(g),cn=parseFloat(c);
+  if(!isNaN(gn)&&!isNaN(cn)&&Math.abs(gn-cn)<0.01)return true;
+  const fv=s=>{const m=s.match(/^(\d+)\/(\d+)$/);return m?parseInt(m[1])/parseInt(m[2]):null;};
+  const gf=fv(g),cf=fv(c);
+  if(gf!==null&&cf!==null&&Math.abs(gf-cf)<0.001)return true;
+  return false;
+}
+
+function handleResult(isCorrect,q){
+  state.attempts++;
+  const elapsed=stopQTimer();
+  if(isCorrect){
+    const pts=state.attempts===1?q.ftr:q.str;
+    state.score+=pts;
+    if(state.attempts===1){state.ftrScore+=q.ftr;state.ftrCount++;state.streak++;state.maxStreak=Math.max(state.maxStreak,state.streak);}
+    else{state.strScore+=q.str;state.streak=0;}
+    recordAnswer(q,true,pts,elapsed);
+    updateTopBar();state.awaitingNext=true;
+    if(state.attempts===1)showCelebration();
+    else{showFeedbackBox('success','✅','Well done on the second try!',`+${q.str} pt${q.str>1?'s':''}!`,'');showNext();}
+  } else {
+    state.streak=0;updateTopBar();
+    if(state.attempts>=2){
+      recordAnswer(q,false,0,elapsed);
+      showFeedbackBox('fail','❌','Not quite — keep going!',`Answer: <strong>${q.answer}</strong>`,getWorkedExample(q));
+      state.awaitingNext=true;showNext();
+    } else {
+      showFeedbackBox('retry','💡','Not quite — one more try!',q.hint?'Hint: '+q.hint:'Think carefully.','');
+      const inp=document.getElementById('qInput'),btn=document.getElementById('btnCheck');
+      if(inp){inp.classList.remove('wrong');inp.value='';inp.focus();btn.disabled=false;}
+      document.querySelectorAll('.mc-opt').forEach(b=>{b.classList.remove('correct','wrong');b.disabled=false;});
+      startQTimer();
+    }
+  }
+}
+
+function selectMatch(side,idx){
+  const q=QUESTIONS[state.idx];if(state.awaitingNext)return;
+  const el=side==='left'?document.getElementById('mL'+idx):document.getElementById('mR'+idx);
+  if(!el||el.classList.contains('matched'))return;
+  if(side==='left'){if(matchLeftSel!==null){const p=document.getElementById('mL'+matchLeftSel);if(p)p.classList.remove('selected');}matchLeftSel=idx;}
+  else{if(matchRightSel!==null){const p=document.getElementById('mR'+matchRightSel);if(p)p.classList.remove('selected');}matchRightSel=idx;}
+  el.classList.add('selected');
+  if(matchLeftSel!==null&&matchRightSel!==null){
+    const lEl=document.getElementById('mL'+matchLeftSel),rEl=document.getElementById('mR'+matchRightSel);
+    if(!lEl||!rEl){matchLeftSel=null;matchRightSel=null;return;}
+    const ok=q.pairs.find(p=>String(p[0])===lEl.dataset.val&&String(p[1])===rEl.dataset.val);
+    if(ok){
+      lEl.classList.remove('selected');rEl.classList.remove('selected');
+      lEl.classList.add('matched');rEl.classList.add('matched');
+      state.matchScore=(state.matchScore||0)+1;
+      if(state.matchScore===q.pairs.length){
+        state.score+=q.ftr;state.ftrScore+=q.ftr;state.ftrCount++;state.streak++;state.maxStreak=Math.max(state.maxStreak,state.streak);
+        recordAnswer(q,true,q.ftr,0);
+        showFeedbackBox('success','🎉','All matched!','Excellent!','');
+        updateTopBar();state.awaitingNext=true;showNext();
+      }
+    } else {
+      lEl.classList.add('wrong-match');rEl.classList.add('wrong-match');
+      setTimeout(()=>{if(lEl)lEl.classList.remove('wrong-match','selected');if(rEl)rEl.classList.remove('wrong-match','selected');},600);
+      state.attempts++;state.streak=0;
+    }
+    matchLeftSel=null;matchRightSel=null;
+  }
+}
+
+function recordAnswer(q,correct,pts,time){state.answers.push({topic:q.topic,obj:q.obj,text:q.text,answer:q.answer,correct,pts,time,mastered:correct&&state.attempts===1});}
+
+function showFeedbackBox(type,icon,title,msg,worked){
+  const box=document.getElementById('feedbackBox');if(!box)return;
+  box.className=`feedback-box ${type} show`;
+  document.getElementById('fbIcon').textContent=icon;
+  document.getElementById('fbTitle').textContent=title;
+  document.getElementById('fbMsg').innerHTML=msg+(worked?`<div class="worked-example">${worked}</div>`:'');
+}
+
+const CELEB_MSGS=['Amazing!','Radar locked on!','Target acquired!','Signal confirmed!','Brilliant!','First-time right!','Nailed it!','On target!'];
+const CELEB_ICONS=['⭐','🎯','📡','✅','🏆','🌟','🛰️','💡'];
+function showCelebration(){
+  const q=QUESTIONS[state.idx];
+  document.getElementById('celebIcon').textContent=pick(CELEB_ICONS);
+  document.getElementById('celebMsg').textContent=pick(CELEB_MSGS);
+  document.getElementById('celebSub').textContent='First Time Right!';
+  document.getElementById('celebPts').textContent=`+${q.ftr} points`;
+  const se=document.getElementById('celebStreak');
+  if(state.streak>=3){se.textContent=`🔥 ${state.streak} in a row!`;se.style.display='block';}else se.style.display='none';
+  document.getElementById('celebration').classList.add('show');
+}
+function closeCelebration(){document.getElementById('celebration').classList.remove('show');showNext();}
+function showNext(){const btn=document.getElementById('btnNext');if(btn)btn.classList.add('show');}
+function nextQuestion(){state.idx++;if(state.idx>=QUESTIONS.length)finishAssessment();else renderQuestion();}
+
+function updateTopBar(){
+  const total=QUESTIONS.length,done=state.idx,pct=Math.round((done/total)*100);
+  document.getElementById('progressText').textContent=`Q${done+1} of ${total}`;
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('scoreDisplay').textContent=`⭐ ${state.score}`;
+  document.getElementById('ftrDisplay').textContent=`FTR: ${state.ftrCount}`;
+  const se=document.getElementById('streakDisplay');
+  if(state.streak>=2){se.style.display='';se.textContent=`🔥 ${state.streak}`;}else se.style.display='none';
+  const q=QUESTIONS[Math.min(state.idx,total-1)];
+  if(q)document.getElementById('topicTag').textContent=q.topic;
+}
+
+function finishAssessment(){
+  clearInterval(timerInterval);
+  saveToHistory();
+  // Show scanning animation
+  goTo('scanning');
+  runScanAnimation();
+}
+
+function runScanAnimation(){
+  const steps=['Collating response data...','Mapping against curriculum objectives...','Identifying performance patterns...','Generating radar analysis...','Building your report...'];
+  const stepsEl=document.getElementById('scanSteps');
+  stepsEl.innerHTML=steps.map((s,i)=>`<div class="scan-step" id="scanStep${i}"><div class="scan-step-dot"></div>${s}</div>`).join('');
+  const fill=document.getElementById('scanProgressFill');
+  let prog=0;
+  steps.forEach((s,i)=>{
+    setTimeout(()=>{
+      document.getElementById('scanningSubtitle').textContent=s;
+      if(i>0)document.getElementById('scanStep'+(i-1)).className='scan-step done';
+      document.getElementById('scanStep'+i).className='scan-step active';
+      prog=Math.round(((i+1)/steps.length)*100);
+      fill.style.width=prog+'%';
+    },i*600);
+  });
+  setTimeout(()=>{
+    steps.forEach((_,i)=>document.getElementById('scanStep'+i).className='scan-step done');
+    fill.style.width='100%';
+    setTimeout(()=>{goTo('results');launchConfetti();buildResults();},400);
+  },steps.length*600+200);
+}
+
+function buildResults(){
+  const total=QUESTIONS.reduce((a,q)=>a+(q.ftr||0),0);
+  const pct=total>0?Math.round((state.score/total)*100):0;
+  const ftrPct=Math.round((state.ftrCount/QUESTIONS.length)*100);
+  const avgTime=state.qTimes&&state.qTimes.length?Math.round(state.qTimes.reduce((a,b)=>a+b,0)/state.qTimes.length):0;
+
+  // Radar score circle
+  const r=42,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
+  const scoreColor=pct>=75?'#00e5a0':pct>=50?'#f59e0b':'#ef4444';
+  document.getElementById('resultsHero').innerHTML=`
+    <div class="radar-score">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="#1e3355" stroke-width="8"/>
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="${scoreColor}" stroke-width="8"
+          stroke-dasharray="${dash} ${gap}" stroke-linecap="round"
+          transform="rotate(-90 50 50)" style="transition:stroke-dasharray 1s ease;filter:drop-shadow(0 0 6px ${scoreColor})"/>
+      </svg>
+      <div class="radar-score-text">
+        <div class="radar-score-val">${pct}%</div>
+        <div class="radar-score-lbl">Score</div>
+      </div>
+    </div>
+    <div class="results-hero-info">
+      <div class="results-hero-name">${state.studentName}</div>
+      <div class="results-hero-sub">Year ${selectedYear} ${selectedMode==='full'?'Full Diagnostic':selectedMode==='10'||selectedMode===10?'Radar Scan':'Deep Scan'} &bull; ${new Date().toLocaleDateString('en-GB')}</div>
+      <div class="results-stats-row">
+        <div class="rs-stat"><div class="rsv green">${state.score}/${total}</div><div class="rsl">Points</div></div>
+        <div class="rs-stat"><div class="rsv ${ftrPct>=70?'green':ftrPct>=50?'':'amber'}">${ftrPct}%</div><div class="rsl">FTR</div></div>
+        <div class="rs-stat"><div class="rsv">${state.maxStreak}</div><div class="rsl">Best Streak</div></div>
+        <div class="rs-stat"><div class="rsv">${avgTime}s</div><div class="rsl">Avg/Q</div></div>
+      </div>
+    </div>`;
+
+  // Topic data
+  const topics={};
+  QUESTIONS.forEach(q=>{if(!topics[q.topic])topics[q.topic]={earned:0,possible:0,count:0};topics[q.topic].possible+=q.ftr;topics[q.topic].count++;});
+  state.answers.forEach(a=>{if(topics[a.topic])topics[a.topic].earned+=a.pts;});
+  const topicResults={};
+  for(const[t,d]of Object.entries(topics)){
+    if(!d.count)continue;
+    topicResults[t]=d.possible>0?Math.round((d.earned/d.possible)*100):0;
+  }
+
+  // Topic bars
+  let tbHTML='';
+  for(const[t,tp]of Object.entries(topicResults)){
+    const cls=tp>=90?'mastery':tp>=70?'secure':tp>=40?'developing':'support';
+    const barCls={mastery:'bar-mastery',secure:'bar-secure',developing:'bar-developing',support:'bar-support'}[cls];
+    const tagCls={mastery:'tag-mastery',secure:'tag-secure',developing:'tag-developing',support:'tag-support'}[cls];
+    const tagLabel={mastery:'Mastery',secure:'Secure',developing:'Developing',support:'Support Needed'}[cls];
+    const pctColor={mastery:'#a78bfa',secure:'#00e5a0',developing:'#f59e0b',support:'#ef4444'}[cls];
+    tbHTML+=`<div class="topic-item">
+      <div class="topic-top"><span class="topic-name">${t}</span><div class="topic-right"><span class="topic-pct" style="color:${pctColor}">${tp}%</span><span class="topic-tag-pill ${tagCls}">${tagLabel}</span></div></div>
+      <div class="topic-bar-track"><div class="topic-bar-fill ${barCls}" style="width:0%" data-w="${tp}"></div></div>
+    </div>`;
+  }
+  document.getElementById('topicBars').innerHTML=tbHTML;
+  setTimeout(()=>document.querySelectorAll('.topic-bar-fill').forEach(el=>el.style.width=el.dataset.w+'%'),200);
+
+  // Radar chart
+  const radarTopics=Object.keys(topicResults).slice(0,7);
+  const radarScores=radarTopics.map(t=>topicResults[t]);
+  setTimeout(()=>{
+    const canvas=document.getElementById('radarCanvas');
+    if(canvas){const ctx=canvas.getContext('2d');drawRadarChart(ctx,radarTopics,radarScores);}
+  },300);
+
+  // Gaps and strengths
+  const strengths=Object.entries(topicResults).filter(([,v])=>v>=75).map(([k])=>k);
+  const gaps=Object.entries(topicResults).filter(([,v])=>v<50).map(([k])=>k);
+  document.getElementById('gapGrid').innerHTML=`
+    <div class="gap-card">
+      <div class="gap-card-title" style="color:var(--green);">✅ Strengths Detected</div>
+      ${strengths.length?strengths.map(s=>`<div class="gap-item"><div class="gap-dot green"></div><span class="gap-item-text">${s}</span></div>`).join(''):'<div class="gap-item"><div class="gap-dot" style="background:var(--text3)"></div><span class="gap-item-text">Keep building across all areas</span></div>'}
+    </div>
+    <div class="gap-card">
+      <div class="gap-card-title" style="color:var(--red);">⚠️ Gaps Detected</div>
+      ${gaps.length?gaps.map(g=>`<div class="gap-item"><div class="gap-dot red"></div><span class="gap-item-text">${g}</span></div>`).join(''):'<div class="gap-item"><div class="gap-dot" style="background:var(--text3)"></div><span class="gap-item-text">No significant gaps found</span></div>'}
+    </div>`;
+
+  // Parent summary
+  const grade=pct>=90?'an outstanding':pct>=75?'a great':pct>=60?'a solid':pct>=40?'a developing':'an emerging';
+  let summary=`${state.studentName} achieved ${grade} result in the Year ${selectedYear} Maths Radar diagnostic, scoring ${pct}% with a first-time accuracy of ${ftrPct}%.`;
+  if(strengths.length)summary+=` Strengths include: ${strengths.slice(0,3).join(', ')}.`;
+  if(gaps.length)summary+=` Priority areas for intervention: ${gaps.slice(0,3).join(', ')}.`;
+  summary+=` Best streak: ${state.maxStreak} consecutive correct answers.`;
+  summary+=pct>=75?' We recommend consolidation and stretching into reasoning and problem-solving tasks.':' We recommend targeted sessions focusing on the detected gap areas to build fluency and confidence.';
+  document.getElementById('parentSummary').innerHTML=`<p>${summary}</p><button class="btn-copy" onclick="copyParentSummary()">📋 Copy to clipboard</button>`;
+  window._parentSummary=summary;
+
+  // Question review
+  let reviewHTML='';
+  state.answers.forEach((a,i)=>{
+    const q=QUESTIONS[i];const we=q&&!a.correct?getWorkedExample(q):'';
+    reviewHTML+=`<div class="review-item ${a.correct?'correct-item':'wrong-item'}">
+      <div class="review-q">${i+1}. ${a.text||''}</div>
+      <div class="review-ans"><span>${a.correct?'✅':'❌'} ${a.correct?'Correct':'Incorrect'}</span><span>Answer: <strong>${a.answer}</strong></span>${a.time?`<span>⏱ ${a.time}s</span>`:''}</div>
+      ${we?`<div class="review-method">${we}</div>`:''}
+    </div>`;
+  });
+  document.getElementById('reviewList').innerHTML=reviewHTML;
+
+  // Recommendations
+  document.getElementById('recommendations').innerHTML=`
+    <div class="rec-section-title">🎯 Priority Areas</div>
+    <ul class="rec-list">${gaps.length?gaps.map(g=>`<li>${g} — targeted practice recommended</li>`).join(''):'<li>No major gaps identified — excellent work!</li>'}</ul>
+    <div class="rec-section-title" style="margin-top:16px;">📋 Next Steps</div>
+    <ul class="rec-list">
+      <li>Book a follow-up session with Robinson Tuition to address gap areas</li>
+      ${selectedYear===3?'<li>Daily 3×, 4×, 8× times table drill — aim for instant recall</li>':'<li>Daily tables drill across all 12 times tables — full fluency target</li>'}
+      <li>Revisit incorrect questions and work through the method shown</li>
+      <li>Run a second Radar Scan after a 4-week intervention block to measure progress</li>
+    </ul>`;
+}
+
+function toggleReview(){const l=document.getElementById('reviewList');const btn=document.querySelector('.review-toggle-btn');const open=l.classList.toggle('open');btn.textContent=`📋 ${open?'Hide':'Review All Questions'} ${open?'▲':'▼'}`;}
+function copyParentSummary(){if(window._parentSummary){navigator.clipboard.writeText(window._parentSummary).then(()=>{const b=document.querySelector('.btn-copy');if(b){b.textContent='✅ Copied!';setTimeout(()=>b.textContent='📋 Copy to clipboard',2000);}}).catch(()=>alert(window._parentSummary));}}
+
+// ── TIMES TABLES ──
+let selectedTables=[2,3,4,5,6,7,8,9,10,11,12],tableMode='normal';
+let tState={idx:0,score:0,streak:0,maxStreak:0,correct:0,wrong:0,questions:[],wrongList:[],timerInterval:null,timeLeft:60};
+
+function initTableSelect(){
+  const container=document.getElementById('tableSelect');if(!container)return;
+  container.innerHTML='';
+  for(let t=2;t<=12;t++){
+    const btn=document.createElement('button');
+    btn.className='tb-btn'+(selectedTables.includes(t)?' selected':'');
+    btn.textContent=`${t}×`;
+    btn.onclick=()=>{
+      if(selectedTables.includes(t)){if(selectedTables.length===1)return;selectedTables=selectedTables.filter(x=>x!==t);}
+      else selectedTables.push(t);
+      btn.classList.toggle('selected',selectedTables.includes(t));
+    };
+    container.appendChild(btn);
+  }
+  const allBtn=document.createElement('button');
+  allBtn.className='tb-btn selected';allBtn.textContent='All';
+  allBtn.onclick=()=>{selectedTables=[2,3,4,5,6,7,8,9,10,11,12];initTableSelect();};
+  container.appendChild(allBtn);
+}
+
+function setTableMode(m){
+  tableMode=m;
+  document.getElementById('tmodeNormal').classList.toggle('active',m==='normal');
+  document.getElementById('tmodeTimed').classList.toggle('active',m==='timed');
+}
+
+function startTables(){
+  if(!selectedTables.length)return;
+  const allQs=[];
+  selectedTables.forEach(t=>{for(let m=1;m<=12;m++){const flip=Math.random()>0.5;allQs.push({a:flip?m:t,b:flip?t:m,answer:t*m});}});
+  tState={idx:0,score:0,streak:0,maxStreak:0,correct:0,wrong:0,questions:shuffle(allQs),wrongList:[],timerInterval:null,timeLeft:60};
+  goTo('tablesGame');
+  const timerEl=document.getElementById('tTimerDisplay');
+  if(tableMode==='timed'){
+    timerEl.style.display='';timerEl.textContent='⏱ 60s';
+    tState.timerInterval=setInterval(()=>{tState.timeLeft--;timerEl.textContent=`⏱ ${tState.timeLeft}s`;if(tState.timeLeft<=0){clearInterval(tState.timerInterval);finishTables();}},1000);
+  } else timerEl.style.display='none';
+  renderTableQ();
+}
+
+function renderTableQ(){
+  const maxQ=tableMode==='normal'?20:99999;
+  const q=tState.questions[tState.idx];
+  if(!q||tState.idx>=maxQ){finishTables();return;}
+  const total=tableMode==='normal'?Math.min(20,tState.questions.length):tState.questions.length;
+  const pct=tableMode==='timed'?Math.round(((60-tState.timeLeft)/60)*100):Math.round((tState.idx/total)*100);
+  document.getElementById('tProgressText').textContent=`Q${tState.idx+1}${tableMode==='normal'?' of '+total:''}`;
+  document.getElementById('tProgressPct').textContent=pct+'%';
+  document.getElementById('tProgressFill').style.width=pct+'%';
+  document.getElementById('tScoreDisplay').textContent=`⭐ ${tState.score}`;
+  const se=document.getElementById('tStreakDisplay');
+  if(tState.streak>=2){se.style.display='';se.textContent=`🔥 ${tState.streak}`;}else se.style.display='none';
+  document.getElementById('tCard').innerHTML=`
+    <div style="font-size:36px;font-weight:900;color:var(--white);margin-bottom:20px;letter-spacing:-1px;">${q.a} × ${q.b} = ?</div>
+    <div class="input-row" style="justify-content:center;margin-bottom:16px;">
+      <input type="number" class="q-input" id="tInput" placeholder="?" style="max-width:110px;font-size:24px;" onkeydown="if(event.key==='Enter')checkTableQ()" autofocus/>
+      <button class="btn-check" onclick="checkTableQ()">✓</button>
+    </div>
+    <div class="feedback-box" id="tFeedback" style="justify-content:center;text-align:center;"></div>`;
+  setTimeout(()=>{const i=document.getElementById('tInput');if(i)i.focus();},50);
+}
+
+function checkTableQ(){
+  const maxQ=tableMode==='normal'?20:99999;
+  const q=tState.questions[tState.idx];if(!q)return;
+  const inp=document.getElementById('tInput');if(!inp||!inp.value.trim())return;
+  const given=parseInt(inp.value.trim()),ok=given===q.answer;
+  inp.classList.add(ok?'correct':'wrong');
+  const fb=document.getElementById('tFeedback');
+  if(ok){
+    tState.score++;tState.correct++;tState.streak++;tState.maxStreak=Math.max(tState.maxStreak,tState.streak);
+    fb.className='feedback-box success show';
+    fb.innerHTML=`<span class="feedback-icon">✅</span><div class="feedback-text"><strong>${pick(CELEB_MSGS)}</strong></div>`;
+    document.getElementById('tScoreDisplay').textContent=`⭐ ${tState.score}`;
+    const se=document.getElementById('tStreakDisplay');
+    if(tState.streak>=2){se.style.display='';se.textContent=`🔥 ${tState.streak}`;}
+  } else {
+    tState.wrong++;tState.streak=0;
+    document.getElementById('tStreakDisplay').style.display='none';
+    tState.wrongList.push({q:`${q.a} × ${q.b}`,correct:q.answer,given});
+    fb.className='feedback-box fail show';
+    fb.innerHTML=`<span class="feedback-icon">❌</span><div class="feedback-text"><strong>${q.a} × ${q.b} = ${q.answer}</strong></div>`;
+  }
+  tState.idx++;
+  if(tState.idx>=Math.min(maxQ,tState.questions.length))setTimeout(finishTables,700);
+  else setTimeout(renderTableQ,ok?450:850);
+}
+
+function finishTables(){
+  clearInterval(tState.timerInterval);
+  const total=tState.correct+tState.wrong;
+  const pct=total>0?Math.round((tState.correct/total)*100):0;
+  let trophy='📚',title="Keep practising!";
+  if(pct>=90){trophy='🏆';title='Outstanding!';}else if(pct>=75){trophy='🥇';title='Great work!';}else if(pct>=60){trophy='🥈';title='Good effort!';}else if(pct>=40){trophy='🥉';title='Keep going!';}
+  document.getElementById('tResultTrophy').textContent=trophy;
+  document.getElementById('tResultTitle').textContent=title;
+  document.getElementById('tResultStats').innerHTML=`
+    <div class="rs-stat"><div class="rsv ${pct>=75?'green':''}" style="font-size:22px;">${pct}%</div><div class="rsl">Accuracy</div></div>
+    <div class="rs-stat"><div class="rsv" style="font-size:22px;">${tState.correct}/${total}</div><div class="rsl">Correct</div></div>
+    <div class="rs-stat"><div class="rsv" style="font-size:22px;">${tState.maxStreak}</div><div class="rsl">Best Streak</div></div>`;
+  const grouped={};
+  tState.wrongList.forEach(w=>{if(!grouped[w.q])grouped[w.q]=w;});
+  const breakdown=Object.values(grouped).length?
+    `<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Needs Practice</div>`+
+    Object.values(grouped).map(w=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg2);border-radius:8px;margin-bottom:5px;font-size:12px;border:1px solid var(--border);"><span style="font-weight:700;color:var(--white);">${w.q} = ?</span><span style="color:var(--text3);">You: <span style="color:var(--red);font-weight:700;">${w.given}</span> → <span style="color:var(--green);font-weight:700;">${w.correct}</span></span></div>`).join(''):
+    '<div style="text-align:center;padding:14px;color:var(--green);font-weight:700;font-size:13px;">🎉 Perfect score!</div>';
+  document.getElementById('tResultBreakdown').innerHTML=breakdown;
+  goTo('tablesResults');
+}
+
+// ── HISTORY ──
+function saveToHistory(){
+  try{
+    const key='mathsradar_history';
+    const existing=JSON.parse(localStorage.getItem(key)||'[]');
+    const total=QUESTIONS.reduce((a,q)=>a+(q.ftr||0),0);
+    const pct=total>0?Math.round((state.score/total)*100):0;
+    const topics={};
+    QUESTIONS.forEach(q=>{if(!topics[q.topic])topics[q.topic]={earned:0,possible:0};topics[q.topic].possible+=q.ftr;});
+    state.answers.forEach(a=>{if(topics[a.topic])topics[a.topic].earned+=a.pts;});
+    const topicScores={};
+    for(const[t,d]of Object.entries(topics)){topicScores[t]=d.possible>0?Math.round((d.earned/d.possible)*100):0;}
+    existing.unshift({name:state.studentName,year:selectedYear,mode:selectedMode,date:new Date().toLocaleDateString('en-GB'),score:pct,points:`${state.score}/${total}`,ftr:Math.round((state.ftrCount/QUESTIONS.length)*100),streak:state.maxStreak,topics:topicScores});
+    localStorage.setItem(key,JSON.stringify(existing.slice(0,20)));
+  }catch(e){console.warn('History save failed',e);}
+}
+
+function buildHistory(){
+  try{
+    const key='mathsradar_history';
+    const history=JSON.parse(localStorage.getItem(key)||'[]');
+    const body=document.getElementById('historyBody');
+    const scoreColor=s=>s>=75?'var(--green)':s>=50?'var(--amber)':'var(--red)';
+    if(!history.length){body.innerHTML='<div class="history-empty">No past scans yet.<br>Complete a diagnostic to see progress here.</div>';return;}
+    body.innerHTML=history.map(r=>{
+      const tBars=Object.entries(r.topics||{}).map(([t,v])=>{
+        const c=v>=75?'var(--green)':v>=50?'var(--amber)':'var(--red)';
+        return `<div class="history-bar-row"><span>${t}</span><div class="history-mini-bar"><div class="history-mini-fill" style="width:${v}%;background:${c}"></div></div><span style="color:${c}">${v}%</span></div>`;
+      }).join('');
+      return `<div class="history-card"><div class="history-card-top"><div><div class="history-name">${r.name} — Year ${r.year}</div><div class="history-meta">${r.date} &bull; ${typeof r.mode==='number'?r.mode+' Q ':r.mode==='full'?'Full ':''}Scan</div></div><div class="history-score" style="color:${scoreColor(r.score)}">${r.score}%</div></div><div style="font-size:10px;color:var(--text3);margin-bottom:9px;">FTR: ${r.ftr}% &bull; 🔥 ${r.streak}</div><div class="history-bars">${tBars}</div></div>`;
+    }).join('');
+  }catch(e){document.getElementById('historyBody').innerHTML='<div class="history-empty">Could not load history.</div>';}
+}
+
+function launchConfetti(){
+  const container=document.getElementById('confettiContainer');
+  const cols=['#00e5a0','#3b82f6','#f59e0b','#a78bfa','#ffffff'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    const sz=Math.random()*8+4;
+    p.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${pick(cols)};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()*1.5}s;transform:rotate(${Math.random()*360}deg);`;
+    container.appendChild(p);setTimeout(()=>p.remove(),4500);
+  }
+}
+</script>
+</body>
+</html>
